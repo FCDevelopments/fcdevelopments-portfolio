@@ -10,6 +10,8 @@ type Project = {
   badge: string;
   link: string;
   github: string;
+  stars?: number;
+  source?: "github" | "manual";
 };
 
 const badgeColors: Record<string, string> = {
@@ -19,6 +21,9 @@ const badgeColors: Record<string, string> = {
   Operations: "bg-cyan-500/15 border-cyan-400/30 text-cyan-300",
   Template: "bg-green-500/15 border-green-400/30 text-green-300",
   Utility: "bg-pink-500/15 border-pink-400/30 text-pink-300",
+  "Web App": "bg-blue-500/15 border-blue-400/30 text-blue-300",
+  Python: "bg-emerald-500/15 border-emerald-400/30 text-emerald-300",
+  Project: "bg-slate-500/15 border-slate-400/30 text-slate-300",
 };
 
 export function ProjectsClient({ projects }: { projects: Project[] }) {

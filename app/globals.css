@@ -735,6 +735,12 @@ input[type="radio"], input[type="checkbox"] { accent-color: var(--brand); cursor
   transition: transform 0.1s ease;
 }
 
+/* ═══════ Two-Page Resume ═══════ */
+.resume-two-page {
+  max-height: none;
+  min-height: auto;
+}
+
 /* ═══════ Print ═══════ */
 @media print {
   header, footer, .builder-sidebar, .button-primary, .button-secondary, .eyebrow { display: none !important; }
@@ -743,4 +749,7 @@ input[type="radio"], input[type="checkbox"] { accent-color: var(--brand); cursor
   .builder-main { display: block; }
   .builder-card { display: none; }
   .resume-sheet { box-shadow: none; border: none; border-radius: 0; padding: 0; max-width: none; }
+  .resume-two-page { page-break-inside: auto; }
+  .resume-two-page .resume-section { page-break-inside: avoid; }
+  .resume-two-page .resume-entry { page-break-inside: avoid; }
 }

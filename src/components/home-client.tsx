@@ -261,15 +261,16 @@ export function HomeClient({ projects, skills }: { projects: Project[]; skills: 
               </h2>
               <p className="text-[var(--muted)] text-lg leading-relaxed mb-4">
                 IT Professional and Software Developer based in Orange County, CA.
-                Building practical tools that solve real problems — from AI-powered
-                development platforms to privacy-first career tools.
+                I come from a hands-on IT background — managing infrastructure, automating
+                operations, and building tools that solve real problems for real people.
               </p>
-              <p className="text-[var(--muted)] leading-relaxed mb-8">
-                Currently focused on OpenClaw AI and the FCDevelopments ecosystem.
-                Background in IT administration, systems support, and identity management.
+              <p className="text-[var(--muted)] leading-relaxed mb-4">
+                Currently co-developing OpenClaw AI and building the FCDevelopments ecosystem.
+                When I&apos;m not coding, you&apos;ll find me hiking trails, training Muay Thai,
+                or hanging out with my dog.
               </p>
               <Link href="/about" className="nav-link text-[var(--brand)] text-sm">
-                My Story →
+                My Full Story →
               </Link>
             </Reveal>
 
@@ -288,7 +289,7 @@ export function HomeClient({ projects, skills }: { projects: Project[]; skills: 
                 <div className="card-chrome p-6">
                   <p className="text-[var(--brand)] text-sm font-semibold uppercase tracking-wider mb-2">Background</p>
                   <h3 className="text-lg font-bold mb-1">IT Ops</h3>
-                  <p className="text-sm text-[var(--muted)]">Okta, Azure AD, Systems</p>
+                  <p className="text-sm text-[var(--muted)]">Okta, Azure AD, MDM, Systems</p>
                 </div>
                 <div className="card-chrome p-6">
                   <p className="text-[var(--brand)] text-sm font-semibold uppercase tracking-wider mb-2">Award</p>

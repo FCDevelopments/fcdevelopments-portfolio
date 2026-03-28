@@ -975,3 +975,148 @@ export const templateOptions: { id: ResumeTemplateId; label: string; description
     description: "Still ATS-aware, but with slightly stronger visual hierarchy.",
   },
 ];
+
+/* ═══════════════════════════════════════════════════════════════
+   Experience-Level Detection & Page Recommendation
+   ═══════════════════════════════════════════════════════════════ */
+
+export type ExperienceLevel = "entry" | "mid" | "senior" | "executive";
+
+export interface PageRecommendation {
+  level: ExperienceLevel;
+  levelLabel: string;
+  recommendedPages: 1 | 2;
+  reason: string;
+  contentScore: number; // 0-100, how "full" the resume is
+  tips: string[];
+}
+
+/**
+ * Estimate total years of experience from date ranges in experience entries.
+ * Handles "Present"/"Current" as today's date.
+ */
+function estimateYearsOfExperience(experience: ExperienceEntry[]): number {
+  const monthNames = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
+  let totalMonths = 0;
+
+  for (const entry of experience) {
+    const parseDate = (s: string): Date | null => {
+      if (!s) return null;
+      const lower = s.toLowerCase().trim();
+      if (lower === "present" || lower === "current") return new Date();
+      // Try "Mon YYYY" or "YYYY"
+      const parts = lower.split(/[\s,]+/);
+      let month = 0, year = 0;
+      for (const p of parts) {
+        const mi = monthNames.findIndex(m => p.startsWith(m));
+        if (mi >= 0) month = mi;
+        const yi = parseInt(p);
+        if (yi > 1900 && yi < 2100) year = yi;
+      }
+      if (year) return new Date(year, month);
+      return null;
+    };
+
+    const start = parseDate(entry.startDate);
+    const end = parseDate(entry.endDate);
+    if (start && end) {
+      const diff = (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24 * 30.44);
+      if (diff > 0) totalMonths += diff;
+    }
+  }
+  return Math.round(totalMonths / 12 * 10) / 10;
+}
+
+/**
+ * Count total meaningful content items across the resume.
+ */
+function countContentItems(data: ResumeData): number {
+  let count = 0;
+  // Experience bullets
+  for (const exp of data.experience) {
+    count += exp.bullets.filter(b => b.trim().length > 10).length;
+  }
+  // Project bullets
+  for (const proj of data.projects) {
+    count += proj.bullets.filter(b => b.trim().length > 10).length;
+  }
+  // Education details
+  for (const edu of data.education) {
+    count += edu.details.filter(d => d.trim().length > 5).length;
+  }
+  // Certifications
+  count += data.certifications.filter(c => c.name.trim()).length;
+  // Skills (each category counts as 1 if populated)
+  if (data.skills.languages.filter(Boolean).length) count += 1;
+  if (data.skills.tools.filter(Boolean).length) count += 1;
+  if (data.skills.strengths.filter(Boolean).length) count += 1;
+  // Summary
+  if (data.summary.trim().length > 20) count += 1;
+  return count;
+}
+
+export function analyzeExperienceLevel(data: ResumeData): PageRecommendation {
+  const years = estimateYearsOfExperience(data.experience);
+  const expCount = data.experience.filter(e => e.company.trim()).length;
+  const totalBullets = data.experience.reduce((s, e) => s + e.bullets.filter(b => b.trim().length > 10).length, 0);
+  const projCount = data.projects.filter(p => p.name.trim()).length;
+  const certCount = data.certifications.filter(c => c.name.trim()).length;
+  const contentItems = countContentItems(data);
+
+  // Content score: rough estimate of how much content there is (0-100)
+  const contentScore = Math.min(100, Math.round(
+    (expCount * 12) + (totalBullets * 3) + (projCount * 8) + (certCount * 5) + (data.summary.trim().length > 50 ? 5 : 0)
+  ));
+
+  // Determine level
+  let level: ExperienceLevel;
+  let levelLabel: string;
+  if (years >= 12 || expCount >= 6) {
+    level = "executive";
+    levelLabel = "Executive / Senior Leadership";
+  } else if (years >= 6 || expCount >= 4) {
+    level = "senior";
+    levelLabel = "Senior Professional";
+  } else if (years >= 2 || expCount >= 2) {
+    level = "mid";
+    levelLabel = "Mid-Level Professional";
+  } else {
+    level = "entry";
+    levelLabel = "Entry Level / Early Career";
+  }
+
+  // Page recommendation logic
+  let recommendedPages: 1 | 2 = 1;
+  let reason = "";
+  const tips: string[] = [];
+
+  if (level === "entry") {
+    recommendedPages = 1;
+    reason = "With early-career experience, a focused one-page resume makes the strongest impression. Recruiters spend ~7 seconds on initial review — make every line count.";
+    if (totalBullets < 6) tips.push("Aim for 3-5 strong, quantified bullet points per role.");
+    if (projCount === 0) tips.push("Add personal or academic projects to fill space and demonstrate initiative.");
+    if (certCount === 0) tips.push("Include relevant certifications or coursework to strengthen your profile.");
+  } else if (level === "mid") {
+    if (contentScore >= 55 && totalBullets >= 10) {
+      recommendedPages = 2;
+      reason = "You have solid experience worth showcasing. A two-page resume lets you tell the full story without cutting impactful achievements.";
+    } else {
+      recommendedPages = 1;
+      reason = "Your experience fits well on one page. Keep it tight — expand to two pages when you have more quantified achievements to show.";
+      if (totalBullets < 8) tips.push("Add more quantified achievements (numbers, percentages, dollar amounts) to justify a second page.");
+    }
+  } else if (level === "senior") {
+    recommendedPages = 2;
+    reason = "With significant experience, a two-page resume is expected. Highlight leadership impact, team size, and business outcomes.";
+    if (totalBullets < 12) tips.push("Senior resumes should have 4-6 bullets per role emphasizing leadership and measurable outcomes.");
+    tips.push("Consider leading bullets with scope indicators: team size, budget, revenue impact.");
+  } else {
+    recommendedPages = 2;
+    reason = "Executive resumes should be two pages. Focus on strategic impact, P&L ownership, organizational transformation, and board-level contributions.";
+    tips.push("Lead with an executive summary rather than a generic objective.");
+    tips.push("Emphasize business outcomes: revenue growth, cost reduction, team scaling, market expansion.");
+  }
+
+  return { level, levelLabel, recommendedPages, reason, contentScore, tips };
+}
+

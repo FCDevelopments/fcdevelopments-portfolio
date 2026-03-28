@@ -1,18 +1,22 @@
 import { ResumeData, ResumeTemplateId } from "@/src/lib/resume-data";
 
 function formatList(items: string[]) {
-  return items.filter(Boolean).join(" • ");
+  return items.filter(Boolean).join(" \u2022 ");
 }
 
 export function ResumePreview({
   data,
   template = "classic",
+  twoPage = false,
 }: {
   data: ResumeData;
   template?: ResumeTemplateId;
+  twoPage?: boolean;
 }) {
+  const sheetClass = `resume-sheet resume-template-${template}${twoPage ? " resume-two-page" : ""}`;
+
   return (
-    <div className={`resume-sheet resume-template-${template}`}>
+    <div className={sheetClass}>
       <header className="border-b border-slate-200 pb-4">
         <h1 className="text-3xl font-bold tracking-tight text-slate-900">{data.contact.fullName || "Your Name"}</h1>
         <p className="mt-1 text-sm font-semibold uppercase tracking-[0.14em] text-slate-600">{data.contact.targetTitle}</p>
@@ -53,25 +57,27 @@ export function ResumePreview({
         ))}
       </section>
 
-      <section className="resume-section">
-        <h2>Projects</h2>
-        {data.projects.map((entry) => (
-          <article key={entry.id} className="resume-entry">
-            <div className="resume-entry-head">
-              <div>
-                <h3>{entry.name}</h3>
-                <p className="resume-entry-subtitle">{entry.stack}</p>
+      {data.projects.filter(p => p.name.trim()).length > 0 && (
+        <section className="resume-section">
+          <h2>Projects</h2>
+          {data.projects.map((entry) => (
+            <article key={entry.id} className="resume-entry">
+              <div className="resume-entry-head">
+                <div>
+                  <h3>{entry.name}</h3>
+                  <p className="resume-entry-subtitle">{entry.stack}</p>
+                </div>
+                {entry.link ? <p className="resume-entry-dates">{entry.link}</p> : null}
               </div>
-              {entry.link ? <p className="resume-entry-dates">{entry.link}</p> : null}
-            </div>
-            <ul>
-              {entry.bullets.filter(Boolean).map((bullet, index) => (
-                <li key={`${entry.id}-${index}`}>{bullet}</li>
-              ))}
-            </ul>
-          </article>
-        ))}
-      </section>
+              <ul>
+                {entry.bullets.filter(Boolean).map((bullet, index) => (
+                  <li key={`${entry.id}-${index}`}>{bullet}</li>
+                ))}
+              </ul>
+            </article>
+          ))}
+        </section>
+      )}
 
       <section className="resume-section">
         <h2>Education</h2>
@@ -112,7 +118,7 @@ export function ResumePreview({
         </p>
       </section>
 
-      {data.certifications.length ? (
+      {data.certifications.filter(c => c.name.trim()).length > 0 && (
         <section className="resume-section">
           <h2>Certifications</h2>
           <ul>
@@ -123,7 +129,7 @@ export function ResumePreview({
             ))}
           </ul>
         </section>
-      ) : null}
+      )}
     </div>
   );
 }

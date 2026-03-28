@@ -1,36 +1,8 @@
 import { SiteShell } from "@/src/components/site-shell";
 import { HomeClient } from "@/src/components/home-client";
+import { fetchGitHubProjects } from "@/src/lib/github";
 
-const projects = [
-  {
-    name: "Resume Builder",
-    description: "Privacy-first, ATS-optimized resume tool. No account. No tracking. Just results.",
-    tech: ["Next.js", "React", "TypeScript", "Tailwind"],
-    badge: "Flagship",
-    link: "/resume-builder",
-  },
-  {
-    name: "OpenClaw AI",
-    description: "Autonomous development platform powered by Claude AI and MCP server orchestration.",
-    tech: ["Python", "Claude API", "Anthropic", "MCP"],
-    badge: "AI Platform",
-    link: "https://github.com/FCDevelopments",
-  },
-  {
-    name: "PlumbModern",
-    description: "SkillsUSA Gold Medal winning website. Modern responsive design for a local business.",
-    tech: ["HTML", "CSS", "JavaScript"],
-    badge: "Gold Medal",
-    link: "https://github.com/FCDevelopments",
-  },
-  {
-    name: "SupportOps Copilot",
-    description: "Automated ticket categorization and reporting from raw support exports.",
-    tech: ["Python", "CLI", "Automation"],
-    badge: "Operations",
-    link: "https://github.com/FCDevelopments",
-  },
-];
+export const revalidate = 3600;
 
 const skills = [
   "Python", "TypeScript", "JavaScript", "React", "Next.js", "Tailwind CSS",
@@ -38,10 +10,21 @@ const skills = [
   "Docker", "Vercel", "Git", "SQL", "Bash", "REST APIs",
 ];
 
-export default function Home() {
+export default async function Home() {
+  const allProjects = await fetchGitHubProjects();
+
+  // Show top 4 on home page
+  const homeProjects = allProjects.slice(0, 4).map((p) => ({
+    name: p.name,
+    description: p.summary,
+    tech: p.tech,
+    badge: p.badge,
+    link: p.link,
+  }));
+
   return (
     <SiteShell>
-      <HomeClient projects={projects} skills={skills} />
+      <HomeClient projects={homeProjects} skills={skills} />
     </SiteShell>
   );
 }

@@ -13,6 +13,8 @@ import {
   RoleRecommendation,
   TransferableResult,
   analyzeTransferableSkills,
+  analyzeExperienceLevel,
+  PageRecommendation,
   recommendRoles,
   rolePresetOptions,
   templateOptions,
@@ -446,10 +448,14 @@ export function ResumeBuilderShell() {
   const [smartRoles, setSmartRoles] = useState<RoleRecommendation[]>([]);
   const [customRole, setCustomRole] = useState("");
   const [transferResult, setTransferResult] = useState<TransferableResult | null>(null);
+  const [twoPage, setTwoPage] = useState(false);
+  const [pageRec, setPageRec] = useState<PageRecommendation | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const applyChanges = useCallback(() => {
     setPreview(clone(draft));
+    const rec = analyzeExperienceLevel(draft);
+    setPageRec(rec);
     setShowToast(true);
     if (toastTimer.current) clearTimeout(toastTimer.current);
     toastTimer.current = setTimeout(() => setShowToast(false), 2400);
@@ -825,6 +831,53 @@ export function ResumeBuilderShell() {
             <div className="mt-4 rounded-2xl bg-[var(--surface-alt)] p-4 text-sm text-[var(--muted)]">
               <strong>Skills in draft:</strong> {skillsLine}
             </div>
+
+            {/* Experience-level & page recommendation */}
+            {pageRec && (
+              <div className="mt-4 rounded-2xl border border-[var(--brand)]/20 bg-[var(--brand)]/5 p-4">
+                <div className="flex flex-wrap items-center gap-3 mb-2">
+                  <span className="px-3 py-1 rounded-full text-xs font-bold bg-[var(--brand)]/15 text-[var(--brand)] border border-[var(--brand)]/25">
+                    {pageRec.levelLabel}
+                  </span>
+                  <span className="text-sm text-[var(--muted)]">
+                    Content density: <strong className="text-[var(--foreground)]">{pageRec.contentScore}/100</strong>
+                  </span>
+                </div>
+                <p className="text-sm text-[var(--muted)] leading-relaxed mb-3">{pageRec.reason}</p>
+                {pageRec.tips.length > 0 && (
+                  <ul className="space-y-1 mb-3">
+                    {pageRec.tips.map((tip, i) => (
+                      <li key={i} className="text-xs text-[var(--muted)] flex gap-2">
+                        <span className="text-[var(--brand)] shrink-0">→</span> {tip}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <div className="flex items-center gap-3">
+                  <span className="text-xs font-semibold text-[var(--muted)] uppercase tracking-wider">Resume pages:</span>
+                  <button
+                    type="button"
+                    className={`px-3 py-1 rounded text-xs font-semibold transition-colors ${!twoPage ? "bg-[var(--brand)] text-[var(--background)]" : "bg-white/5 text-[var(--muted)] border border-white/10"}`}
+                    onClick={() => setTwoPage(false)}
+                  >
+                    1 Page
+                  </button>
+                  <button
+                    type="button"
+                    className={`px-3 py-1 rounded text-xs font-semibold transition-colors ${twoPage ? "bg-[var(--brand)] text-[var(--background)]" : "bg-white/5 text-[var(--muted)] border border-white/10"}`}
+                    onClick={() => setTwoPage(true)}
+                  >
+                    2 Pages
+                  </button>
+                  {pageRec.recommendedPages === 2 && !twoPage && (
+                    <span className="text-xs text-[var(--brand)] font-medium">← Recommended for your level</span>
+                  )}
+                  {pageRec.recommendedPages === 1 && twoPage && (
+                    <span className="text-xs text-[var(--brand)] font-medium">← 1 page recommended for your level</span>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* CONTACT */}
@@ -980,7 +1033,7 @@ export function ResumeBuilderShell() {
           </div>
 
           {/* LIVE PREVIEW */}
-          <ResumePreview data={preview} template={template} />
+          <ResumePreview data={preview} template={template} twoPage={twoPage} />
 
         </section>
       </div>
