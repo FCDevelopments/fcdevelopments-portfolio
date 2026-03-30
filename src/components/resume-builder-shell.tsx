@@ -152,7 +152,7 @@ function parseBullets(block: string): string[] {
   }, []);
 
   /* Second pass: keep only substantive bullets */
-  return joined.filter((l) => l.length > 15).slice(0, 6);
+  return joined.filter((l) => l.length > 10).slice(0, 8);
 }
 
 /**
@@ -166,8 +166,6 @@ function parseExperienceEntries(block: string): ExperienceEntry[] {
   const dateRe =
     /(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}\s*[-–—]\s*(?:Present|Current|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4})/i;
 
-  /* Split on lines that look like a company name (non-bullet, non-date heading lines).
-     Heuristic: a line that contains " — " or is followed by a date line. */
   const lines = block.split("\n").map((l) => l.trim()).filter(Boolean);
 
   /* Detect "entry start" lines: either has " — " (company pattern) or
@@ -177,7 +175,7 @@ function parseExperienceEntries(block: string): ExperienceEntry[] {
     const line = lines[i];
     if (line.startsWith("-") || line.startsWith("•")) continue;
     const nextLine = lines[i + 1] || "";
-    const hasCompanySep = /\s[—–-]\s/.test(line) && !dateRe.test(line);
+    const hasCompanySep = /\s[—–]\s/.test(line) && !dateRe.test(line);
     const nextHasDate = dateRe.test(nextLine) || /\|/.test(nextLine);
     if (hasCompanySep || (i === 0 && !line.startsWith("-"))) {
       entryStarts.push(i);
@@ -196,7 +194,7 @@ function parseExperienceEntries(block: string): ExperienceEntry[] {
 
     /* First line = company, second line = title | dates */
     const companyLine = chunk[0] || "";
-    const companyParts = companyLine.split(/\s[—–-]\s/);
+    const companyParts = companyLine.split(/\s[—–]\s/);
     const company = companyParts[0]?.trim() || companyLine;
     const location = companyParts[1]?.trim() || "";
 
@@ -204,11 +202,13 @@ function parseExperienceEntries(block: string): ExperienceEntry[] {
     let title = "";
     let startDate = "";
     let endDate = "";
+    let titleDateLineIdx = -1;
     for (let j = 1; j < Math.min(4, chunk.length); j++) {
       const cl = chunk[j];
       if (cl.startsWith("-") || cl.startsWith("•")) break;
       const dm = cl.match(dateRe);
       if (dm) {
+        titleDateLineIdx = j;
         const [s, ed] = dm[0].split(/\s*[-–—]\s*/);
         startDate = s?.trim() || "";
         endDate = ed?.trim() || "";
@@ -220,14 +220,52 @@ function parseExperienceEntries(block: string): ExperienceEntry[] {
       }
     }
 
-    const bulletBlock = chunk.filter((l) => l.startsWith("-") || l.startsWith("•")).join("\n");
+    /* ── Extract bullets ── */
+    /* Strategy 1: traditional line-separated bullets */
+    let bulletLines = chunk.filter((l) => l.startsWith("-") || l.startsWith("•"));
+
+    /* Strategy 2: inline bullets separated by " - " within paragraph text (LaTeX PDFs) */
+    if (bulletLines.length === 0) {
+      /* The title/date line and subsequent lines may contain inline bullets.
+         Pattern: "Title | Date - Bullet1 sentence. - Bullet2 sentence." */
+      const inlineSource: string[] = [];
+      for (let j = titleDateLineIdx >= 0 ? titleDateLineIdx : 1; j < chunk.length; j++) {
+        const cl = chunk[j];
+        if (cl === companyLine) continue;
+        inlineSource.push(cl);
+      }
+      const joined = inlineSource.join(" ");
+
+      /* Split on " - " that appears after a date or after a sentence ending (.!?) */
+      const afterDate = dateRe.test(joined)
+        ? joined.replace(dateRe, (m) => m + "|||SPLIT|||").split("|||SPLIT|||").pop() || ""
+        : joined;
+
+      /* Split on " - " pattern: must be preceded by end-of-sentence or start */
+      const inlineBullets = afterDate
+        .split(/\s+-\s+/)
+        .map((s) => s.replace(/^[-•]\s*/, "").trim())
+        .filter((s) => s.length > 15);
+
+      if (inlineBullets.length > 0) {
+        bulletLines = inlineBullets.map(b => "- " + b);
+      }
+    }
+
+    const bulletBlock = bulletLines.join("\n");
     const bullets = parseBullets(bulletBlock);
+
+    /* Clean title: remove any trailing inline bullet content that got mixed in */
+    let cleanTitle = title;
+    if (cleanTitle.includes(" - ") && cleanTitle.length > 60) {
+      cleanTitle = cleanTitle.split(/\s+-\s+/)[0]?.trim() || cleanTitle;
+    }
 
     entries.push({
       id: `pe-${Date.now()}-${e}`,
       company,
       location,
-      title: title || "Role",
+      title: cleanTitle || "Role",
       startDate,
       endDate,
       bullets: bullets.length ? bullets : [""],
@@ -299,6 +337,7 @@ function parseResumeText(raw: string, current: ResumeData): ResumeData {
   /* First non-empty header line that doesn't look like a tagline/subtitle = name */
   const nameLine = headerLines.find((l) =>
     l.length < 50 && !/[|@]/.test(l) && !/placeholder/i.test(l) &&
+    !/\[.*\]/i.test(l) &&
     !/support|engineer|developer|administrator|help desk/i.test(l)
   );
   if (nameLine) contact.fullName = nameLine;
@@ -307,6 +346,14 @@ function parseResumeText(raw: string, current: ResumeData): ResumeData {
   if (linkedinMatch) contact.linkedin = linkedinMatch[0];
   if (githubMatch) contact.github = githubMatch[0];
   if (locationMatch) contact.location = locationMatch[1];
+
+  /* Strip bracket placeholders from all contact fields */
+  for (const key of Object.keys(contact) as (keyof typeof contact)[]) {
+    const val = contact[key];
+    if (/^\[.*placeholder.*\]$/i.test(val) || /^\[.*url.*\]$/i.test(val) || /^\[.*state.*\]$/i.test(val)) {
+      contact[key] = "";
+    }
+  }
 
   /* Tagline / target title (line with pipes like "IT Support | Technical Support") */
   const tagline = headerLines.find((l) => l.includes("|") && !/@|\.com|placeholder/i.test(l));
@@ -350,7 +397,16 @@ function parseResumeText(raw: string, current: ResumeData): ResumeData {
     sections.get("work experience") ||
     sections.get("experience") ||
     "";
-  const experience = expBlock ? parseExperienceEntries(expBlock) : current.experience;
+  let experience = expBlock ? parseExperienceEntries(expBlock) : current.experience;
+
+  /* Also parse LEADERSHIP as additional experience entries */
+  const leaderBlock = sections.get("leadership") || "";
+  if (leaderBlock) {
+    const leaderEntries = parseExperienceEntries(leaderBlock);
+    if (leaderEntries.length) {
+      experience = [...experience, ...leaderEntries];
+    }
+  }
 
   /* ── Projects ── */
   const projBlock = sections.get("projects") || "";
@@ -530,11 +586,16 @@ export function ResumeBuilderShell() {
 
   const handleImportText = () => {
     if (!rawText.trim()) return;
-    setDraft((d) => {
-      const parsed = parseResumeText(rawText, d);
-      runSmartRoles(parsed);
-      return parsed;
-    });
+    const parsed = parseResumeText(rawText, clone(draft));
+    runSmartRoles(parsed);
+    setDraft(parsed);
+    /* Auto-apply to preview */
+    setPreview(clone(parsed));
+    const rec = analyzeExperienceLevel(parsed);
+    setPageRec(rec);
+    setShowToast(true);
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setShowToast(false), 2400);
   };
 
   const handleFileUpload = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -579,11 +640,17 @@ export function ResumeBuilderShell() {
     }
 
     setRawText(text);
-    setDraft((d) => {
-      const parsed = parseResumeText(text, d);
-      runSmartRoles(parsed);
-      return parsed;
-    });
+    const currentDraft = clone(draft);
+    const parsed = parseResumeText(text, currentDraft);
+    runSmartRoles(parsed);
+    setDraft(parsed);
+    /* Auto-apply to preview immediately */
+    setPreview(clone(parsed));
+    const rec = analyzeExperienceLevel(parsed);
+    setPageRec(rec);
+    setShowToast(true);
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setShowToast(false), 2400);
   };
 
   const handleSaveJson = () => {
@@ -614,24 +681,23 @@ export function ResumeBuilderShell() {
         <section className="builder-sidebar">
 
           <div className="builder-card">
-            <p className="eyebrow">Step 1</p>
-            <h2>Import or start from scratch</h2>
-            <p className="muted-copy">Upload a TXT file or paste resume text. The system will extract your information into editable sections.</p>
+            <p className="eyebrow">Import</p>
+            <h2>Upload your resume</h2>
             <label className="upload-box">
-              <span className="font-semibold text-[var(--foreground)]">Upload resume</span>
-              <span>Supports PDF and plain text files. We&apos;ll extract the content automatically.</span>
+              <span className="font-semibold text-[var(--foreground)]">Drop a PDF or TXT file here</span>
+              <span style={{ fontSize: "0.78rem" }}>or click to browse</span>
               <input type="file" accept=".pdf,.txt,application/pdf,text/plain" onChange={handleFileUpload} />
             </label>
             <textarea className="builder-textarea" value={rawText} onChange={(e) => setRawText(e.target.value)} placeholder="Or paste resume text here…" />
             <div className="action-row mt-3">
               <button className="button-primary" type="button" onClick={handleImportText}>Import text</button>
-              <button className="button-secondary" type="button" onClick={() => { setDraft(clone(defaultResumeData)); setRawText(""); }}>Reset starter</button>
+              <button className="button-secondary" type="button" onClick={() => { setDraft(clone(defaultResumeData)); setRawText(""); }}>Reset</button>
             </div>
           </div>
 
           <div className="builder-card">
-            <p className="eyebrow">Step 2</p>
-            <h2>{smartRoles.length ? "Recommended roles" : "Role preset"}</h2>
+            <p className="eyebrow">Target Role</p>
+            <h2>{smartRoles.length ? "Recommended roles" : "Choose a direction"}</h2>
             {smartRoles.length > 0 ? (
               <div className="smart-roles-grid">
                 {smartRoles.map((r) => (
@@ -766,8 +832,8 @@ export function ResumeBuilderShell() {
           </div>
 
           <div className="builder-card">
-            <p className="eyebrow">Step 3</p>
-            <h2>Template</h2>
+            <p className="eyebrow">Template</p>
+            <h2>Style</h2>
             <select className="builder-input" value={template} onChange={(e) => setTemplate(e.target.value as ResumeTemplateId)}>
               {templateOptions.map((o) => <option key={o.id} value={o.id}>{o.label}</option>)}
             </select>
@@ -775,8 +841,8 @@ export function ResumeBuilderShell() {
           </div>
 
           <div className="builder-card">
-            <p className="eyebrow">Step 4</p>
-            <h2>Privacy controls</h2>
+            <p className="eyebrow">Privacy</p>
+            <h2>Data handling</h2>
             <div className="privacy-panel">
               <label className="privacy-option">
                 <input type="radio" checked={privacyMode === "session"} onChange={() => setPrivacyMode("session")} />
@@ -798,8 +864,8 @@ export function ResumeBuilderShell() {
           </div>
 
           <div className="builder-card">
-            <p className="eyebrow">Step 5</p>
-            <h2>Job description tailoring</h2>
+            <p className="eyebrow">ATS Check</p>
+            <h2>Job description match</h2>
             <textarea className="builder-textarea" value={jobDescription} onChange={(e) => setJobDescription(e.target.value)} placeholder="Paste a job description to see keyword overlap…" />
             <div className="builder-inline-note">
               <strong>Keyword matches:</strong>{" "}
@@ -815,21 +881,16 @@ export function ResumeBuilderShell() {
           <div className="builder-card">
             <div className="section-head-row">
               <div>
-                <p className="eyebrow">Editing workspace</p>
-                <h2>Edit • Apply • Export</h2>
+                <p className="eyebrow">Editor</p>
+                <h2>Edit &amp; Preview</h2>
               </div>
               <div className="action-row">
                 <ApplyButton onClick={applyChanges} />
-                <button className="button-secondary" type="button" onClick={handleExport}>Export / Print PDF</button>
+                <button className="button-secondary" type="button" onClick={handleExport}>Export PDF</button>
               </div>
             </div>
             <div className="draft-state-banner mt-3">
-              Edit any field below, then click <strong>Apply changes</strong> to update the live resume preview.
-              <br />
-              <strong>Preview shows:</strong> {preview.contact.fullName} — {preview.contact.targetTitle}
-            </div>
-            <div className="mt-4 rounded-2xl bg-[var(--surface-alt)] p-4 text-sm text-[var(--muted)]">
-              <strong>Skills in draft:</strong> {skillsLine}
+              <strong>{preview.contact.fullName}</strong> — {preview.contact.targetTitle || "No role selected"}
             </div>
 
             {/* Experience-level & page recommendation */}
@@ -1027,8 +1088,11 @@ export function ResumeBuilderShell() {
           {/* SECOND APPLY BUTTON */}
           <div className="builder-card">
             <div className="section-head-row">
-              <p className="muted-copy">Happy with your changes? Apply them to the resume preview below.</p>
-              <ApplyButton onClick={applyChanges} />
+              <p className="muted-copy">Ready? Apply to update the preview below.</p>
+              <div className="action-row">
+                <ApplyButton onClick={applyChanges} />
+                <button className="button-secondary" type="button" onClick={handleExport}>Export PDF</button>
+              </div>
             </div>
           </div>
 

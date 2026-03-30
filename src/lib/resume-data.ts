@@ -306,6 +306,12 @@ const ROLE_RULES: RoleRule[] = [
     signals: [["dental hygienist",18],["rdh",15],["prophylaxis",12],["periodontal",10],["scaling",8],["root planing",8],["x-ray",6],["radiograph",8],["fluoride",6],["sealant",6],["patient education",8],["dental",10],["oral health",8]], threshold: 25,
   },
   {
+    id: "dental-assistant", label: "Dental Assistant",
+    tagline: "Dental Assistant | Dental Office Assistant | Chair-Side Assistant",
+    summaryHint: "Highlight chair-side assisting, sterilization protocols, dental software, x-ray certification, and patient communication.",
+    signals: [["dental assistant",18],["dental",12],["chair-side",10],["sterilization",10],["autoclave",8],["x-ray",8],["radiograph",6],["impression",8],["dental records",8],["four-handed",8],["suction",6],["dental office",10],["patient",6],["scheduling",5],["front office",5],["dentrix",8],["eaglesoft",8]], threshold: 25,
+  },
+  {
     id: "physical-therapist", label: "Physical Therapist / PTA",
     tagline: "Physical Therapist | PTA | Rehabilitation Specialist",
     summaryHint: "Highlight treatment plans, therapeutic exercise programs, patient outcomes, and clinical documentation.",
@@ -767,6 +773,244 @@ const ROLE_RULES: RoleRule[] = [
     summaryHint: "Highlight animal handling, lab work, anesthesia monitoring, and client education.",
     signals: [["veterinary technician",18],["vet tech",15],["veterinary assistant",12],["animal",8],["dog",5],["cat",5],["anesthesia",8],["blood draw",8],["dental cleaning",6],["x-ray",6],["kennel",5],["surgery assist",8],["vaccination",6]], threshold: 25,
   },
+
+  /* ═══════════════════════════════════════════════════════════════
+     RETAIL & CASHIER
+     ═══════════════════════════════════════════════════════════════ */
+  {
+    id: "cashier", label: "Cashier",
+    tagline: "Cashier | Checkout Associate | Front-End Cashier",
+    summaryHint: "Highlight transaction speed, cash handling accuracy, customer interaction, and loss prevention awareness.",
+    signals: [["cashier",18],["cash handling",12],["register",10],["pos",10],["point of sale",10],["checkout",10],["change",5],["scan",5],["bag",5],["transaction",8],["customer service",6],["receipt",5],["self-checkout",6],["drawer",6]], threshold: 20,
+  },
+  {
+    id: "stocker", label: "Stock Clerk / Stocker",
+    tagline: "Stock Clerk | Stocker | Inventory Associate | Shelf Stocker",
+    summaryHint: "Focus on stocking speed, planogram compliance, inventory accuracy, and physical stamina.",
+    signals: [["stocker",18],["stock clerk",15],["stocking",12],["shelf",8],["planogram",10],["inventory",8],["unload",8],["pallet",6],["backroom",6],["merchandise",6],["freight",6],["overnight",5],["replenishment",8],["overstock",6]], threshold: 20,
+  },
+  {
+    id: "retail-keyholder", label: "Retail Keyholder / Lead",
+    tagline: "Keyholder | Shift Lead | Team Lead | Senior Associate",
+    summaryHint: "Emphasize opening/closing responsibilities, team supervision, cash reconciliation, and customer escalation handling.",
+    signals: [["keyholder",18],["shift lead",15],["team lead",12],["opening",6],["closing",6],["cash reconciliation",10],["deposit",6],["escalation",6],["supervisor",8],["retail",6],["scheduling",6],["training",5],["loss prevention",6]], threshold: 20,
+  },
+
+  /* ═══════════════════════════════════════════════════════════════
+     FAST FOOD & QUICK SERVICE
+     ═══════════════════════════════════════════════════════════════ */
+  {
+    id: "fast-food", label: "Fast Food Worker",
+    tagline: "Fast Food Worker | Crew Member | Team Member",
+    summaryHint: "Highlight speed of service, order accuracy, food safety compliance, and multitasking under pressure.",
+    signals: [["fast food",15],["crew member",15],["team member",10],["drive-thru",12],["drive through",10],["fryer",6],["grill",6],["order",6],["food prep",8],["food safety",8],["mcdonald",6],["burger",5],["sandwich",5],["rush",5],["speed of service",8],["counter",6]], threshold: 20,
+  },
+  {
+    id: "dishwasher", label: "Dishwasher / Kitchen Utility",
+    tagline: "Dishwasher | Kitchen Utility | Sanitation Worker",
+    summaryHint: "Focus on sanitation standards, dish throughput, kitchen support, and reliability during peak service.",
+    signals: [["dishwasher",18],["dish",10],["sanitation",10],["kitchen utility",12],["bus",6],["clean",6],["sanitize",8],["pot",5],["pan",5],["restaurant",5],["commercial kitchen",8],["food safety",6],["industrial dishwasher",8]], threshold: 20,
+  },
+
+  /* ═══════════════════════════════════════════════════════════════
+     MANUFACTURING & FACTORY
+     ═══════════════════════════════════════════════════════════════ */
+  {
+    id: "assembly-worker", label: "Assembly Line Worker",
+    tagline: "Assembly Worker | Production Associate | Manufacturing Associate",
+    summaryHint: "Highlight production rate, quality standards, team coordination, and safety record on the line.",
+    signals: [["assembly",15],["assembly line",18],["production associate",15],["manufacturing",10],["line worker",12],["conveyor",8],["station",5],["parts",6],["component",6],["build",5],["quota",6],["lean",6],["shift",5],["quality",6],["inspection",5]], threshold: 20,
+  },
+  {
+    id: "forklift-operator", label: "Forklift Operator",
+    tagline: "Forklift Operator | Material Handler | Reach Truck Operator",
+    summaryHint: "Lead with certification type, load capacity experience, safety record, and warehouse operations.",
+    signals: [["forklift",18],["forklift operator",18],["material handler",15],["reach truck",10],["pallet jack",8],["order picker",8],["cherry picker",6],["loading dock",8],["warehouse",6],["osha",6],["sit-down",6],["stand-up",6],["propane",5],["electric",5],["certification",6]], threshold: 20,
+  },
+  {
+    id: "production-supervisor", label: "Production Supervisor",
+    tagline: "Production Supervisor | Manufacturing Supervisor | Shift Supervisor",
+    summaryHint: "Focus on team size managed, production targets met, downtime reduction, and safety compliance.",
+    signals: [["production supervisor",18],["manufacturing supervisor",15],["shift supervisor",12],["production line",10],["crew",8],["output",8],["downtime",8],["efficiency",6],["lean manufacturing",8],["5s",6],["kaizen",8],["shift",5],["headcount",6],["osha",5]], threshold: 25,
+  },
+  {
+    id: "packager", label: "Packer / Packager",
+    tagline: "Packer | Packager | Packaging Associate | Shipping Associate",
+    summaryHint: "Highlight packing speed, accuracy, labeling compliance, and ability to meet daily quotas.",
+    signals: [["packer",18],["packager",15],["packaging",12],["pack",8],["label",6],["box",5],["tape",5],["shrink wrap",6],["palletize",8],["shipping",6],["order",5],["quota",6],["fulfillment",6],["e-commerce",6]], threshold: 20,
+  },
+
+  /* ═══════════════════════════════════════════════════════════════
+     HEALTHCARE — ADDITIONAL
+     ═══════════════════════════════════════════════════════════════ */
+  {
+    id: "home-health-aide", label: "Home Health Aide",
+    tagline: "Home Health Aide | HHA | Personal Care Aide | Caregiver",
+    summaryHint: "Highlight ADL assistance, medication reminders, companionship, mobility support, and reliable transportation.",
+    signals: [["home health aide",18],["hha",15],["caregiver",12],["personal care aide",12],["home care",12],["adl",8],["bathing",6],["dressing",6],["feeding",6],["mobility",8],["companionship",6],["medication reminder",8],["elderly",6],["senior care",8],["in-home",8]], threshold: 20,
+  },
+  {
+    id: "phlebotomist", label: "Phlebotomist",
+    tagline: "Phlebotomist | Blood Draw Technician | Lab Phlebotomist",
+    summaryHint: "Focus on venipuncture success rate, patient comfort, specimen handling, and lab protocols.",
+    signals: [["phlebotomist",18],["phlebotomy",15],["blood draw",12],["venipuncture",12],["specimen",10],["capillary",8],["butterfly needle",8],["vacutainer",8],["lab",6],["centrifuge",6],["patient",6],["vein",6],["tourniquet",6]], threshold: 20,
+  },
+  {
+    id: "medical-receptionist", label: "Medical Receptionist",
+    tagline: "Medical Receptionist | Front Desk Medical | Patient Services Representative",
+    summaryHint: "Highlight patient scheduling, insurance verification, EHR navigation, and HIPAA compliance.",
+    signals: [["medical receptionist",18],["front desk",8],["patient scheduling",12],["insurance verification",10],["copay",8],["referral",6],["ehr",8],["emr",6],["hipaa",8],["check-in",8],["appointment",8],["medical office",10],["phone",5],["fax",5]], threshold: 25,
+  },
+  {
+    id: "occupational-therapist", label: "Occupational Therapist / OTA",
+    tagline: "Occupational Therapist | OT | OTA | Rehabilitation Specialist",
+    summaryHint: "Highlight functional assessments, adaptive equipment training, treatment plans, and patient outcomes.",
+    signals: [["occupational therapy",15],["occupational therapist",18],["ota",12],["adaptive equipment",10],["functional assessment",10],["adl",8],["fine motor",8],["splint",6],["hand therapy",8],["pediatric",6],["geriatric",6],["treatment plan",8],["rehabilitation",8]], threshold: 25,
+  },
+
+  /* ═══════════════════════════════════════════════════════════════
+     GIG ECONOMY & DRIVING
+     ═══════════════════════════════════════════════════════════════ */
+  {
+    id: "rideshare-driver", label: "Rideshare / Gig Driver",
+    tagline: "Rideshare Driver | Uber Driver | Lyft Driver | Gig Worker",
+    summaryHint: "Highlight ride count, rating, customer service, navigation skills, and vehicle maintenance.",
+    signals: [["rideshare",15],["uber",12],["lyft",12],["gig",8],["driver",8],["ride",6],["passenger",8],["rating",6],["navigation",6],["clean driving record",8],["customer service",6],["flexible schedule",6],["independent contractor",8]], threshold: 20,
+  },
+  {
+    id: "bus-driver", label: "Bus Driver / Transit Operator",
+    tagline: "Bus Driver | Transit Operator | School Bus Driver | Shuttle Driver",
+    summaryHint: "Lead with CDL, passenger count, safety record, route knowledge, and ADA compliance.",
+    signals: [["bus driver",18],["transit operator",15],["school bus",12],["shuttle driver",10],["cdl",8],["passenger",10],["route",8],["ada",6],["pre-trip inspection",8],["dot",6],["clean driving record",8],["fixed route",6],["charter",5]], threshold: 20,
+  },
+
+  /* ═══════════════════════════════════════════════════════════════
+     CHILDCARE & DOMESTIC
+     ═══════════════════════════════════════════════════════════════ */
+  {
+    id: "nanny", label: "Nanny / Babysitter",
+    tagline: "Nanny | Babysitter | Childcare Provider | Au Pair",
+    summaryHint: "Highlight ages cared for, activities planned, CPR/First Aid certification, and family communication.",
+    signals: [["nanny",18],["babysitter",15],["babysitting",12],["au pair",10],["infant",8],["toddler",8],["child",6],["diaper",5],["bottle",5],["bedtime",5],["playtime",6],["homework help",6],["school pickup",6],["meal prep",6],["cpr certified",8],["first aid",6]], threshold: 20,
+  },
+  {
+    id: "pet-groomer", label: "Pet Groomer / Dog Groomer",
+    tagline: "Pet Groomer | Dog Groomer | Animal Groomer | Grooming Stylist",
+    summaryHint: "Focus on breeds handled, grooming techniques, safety handling, and client retention.",
+    signals: [["pet groomer",18],["dog groomer",15],["grooming",12],["groomer",12],["bathing",6],["clipping",8],["nail trim",8],["de-shedding",6],["breed standard",8],["scissor",6],["clipper",6],["kennel",5],["pet",6],["animal handling",8]], threshold: 20,
+  },
+
+  /* ═══════════════════════════════════════════════════════════════
+     DATA ENTRY & OFFICE SUPPORT
+     ═══════════════════════════════════════════════════════════════ */
+  {
+    id: "data-entry", label: "Data Entry Clerk",
+    tagline: "Data Entry Clerk | Data Entry Specialist | Typist",
+    summaryHint: "Highlight typing speed (WPM), accuracy rate, database proficiency, and volume processed.",
+    signals: [["data entry",18],["data entry clerk",18],["typing",10],["wpm",10],["keystrokes",8],["database",8],["spreadsheet",6],["excel",6],["data processing",10],["accuracy",8],["10-key",8],["alphanumeric",6],["transcription",8],["form",5]], threshold: 20,
+  },
+  {
+    id: "virtual-assistant", label: "Virtual Assistant",
+    tagline: "Virtual Assistant | Remote Administrative Support | Executive VA",
+    summaryHint: "Highlight task management, calendar coordination, email management, and tool proficiency.",
+    signals: [["virtual assistant",18],["remote assistant",12],["va ",8],["calendar management",10],["email management",10],["scheduling",8],["travel booking",6],["inbox",6],["task management",8],["asana",6],["trello",6],["notion",6],["slack",5],["zoom",5]], threshold: 20,
+  },
+
+  /* ═══════════════════════════════════════════════════════════════
+     TRADES — ADDITIONAL
+     ═══════════════════════════════════════════════════════════════ */
+  {
+    id: "painter", label: "Painter",
+    tagline: "Painter | House Painter | Commercial Painter | Paint Contractor",
+    summaryHint: "Highlight surface preparation, coating types, spray equipment, and project completion speed.",
+    signals: [["painter",18],["painting",15],["house painter",12],["commercial painter",10],["spray",8],["roller",6],["brush",5],["primer",6],["latex",5],["stain",6],["surface prep",8],["drywall repair",6],["tape",5],["drop cloth",5],["exterior",6],["interior",6]], threshold: 20,
+  },
+  {
+    id: "roofer", label: "Roofer",
+    tagline: "Roofer | Roofing Technician | Roofing Installer",
+    summaryHint: "Focus on roofing systems installed, safety certifications, weather resilience, and crew collaboration.",
+    signals: [["roofer",18],["roofing",15],["shingle",10],["tile roof",8],["flat roof",8],["tpo",8],["flashing",8],["leak repair",8],["gutter",6],["tear-off",6],["underlayment",6],["fall protection",8],["ladder",5],["osha",6]], threshold: 20,
+  },
+  {
+    id: "tiler", label: "Tile Installer / Setter",
+    tagline: "Tile Installer | Tile Setter | Flooring Installer",
+    summaryHint: "Highlight tile types, layout patterns, mortar mixing, waterproofing, and precision cutting.",
+    signals: [["tile installer",18],["tile setter",15],["tiler",12],["ceramic",8],["porcelain",8],["backsplash",8],["mortar",8],["grout",8],["thinset",8],["waterproofing",6],["schluter",6],["wet saw",8],["flooring",6],["level",5]], threshold: 20,
+  },
+
+  /* ═══════════════════════════════════════════════════════════════
+     AVIATION & TRAVEL
+     ═══════════════════════════════════════════════════════════════ */
+  {
+    id: "flight-attendant", label: "Flight Attendant",
+    tagline: "Flight Attendant | Cabin Crew | In-Flight Service",
+    summaryHint: "Highlight safety training, customer service at altitude, conflict resolution, and multilingual abilities.",
+    signals: [["flight attendant",18],["cabin crew",15],["in-flight",10],["airline",10],["safety demonstration",8],["turbulence",5],["boarding",6],["beverage service",6],["emergency evacuation",8],["faa",8],["cpr",6],["first aid",6],["passenger",6],["galley",6]], threshold: 20,
+  },
+
+  /* ═══════════════════════════════════════════════════════════════
+     GOVERNMENT & PUBLIC SERVICE
+     ═══════════════════════════════════════════════════════════════ */
+  {
+    id: "mail-carrier", label: "Mail Carrier / Postal Worker",
+    tagline: "Mail Carrier | Postal Worker | Letter Carrier | USPS",
+    summaryHint: "Highlight route efficiency, delivery accuracy, weather reliability, and physical stamina.",
+    signals: [["mail carrier",18],["postal worker",15],["letter carrier",12],["usps",12],["post office",10],["mail",8],["delivery",6],["route",8],["package",6],["certified mail",6],["po box",5],["sorting",6],["postal exam",8],["walking route",6]], threshold: 20,
+  },
+  {
+    id: "firefighter", label: "Firefighter",
+    tagline: "Firefighter | Fire Captain | Fire Engineer | Wildland Firefighter",
+    summaryHint: "Lead with certifications, apparatus operation, rescue training, and fitness standards.",
+    signals: [["firefighter",18],["fire department",12],["fire engine",8],["ladder",6],["hose",6],["nfpa",10],["emt",6],["rescue",8],["hazmat",8],["wildland",8],["structure fire",8],["turnout gear",6],["scba",8],["fire academy",8],["cpat",8]], threshold: 20,
+  },
+  {
+    id: "police-officer", label: "Police Officer",
+    tagline: "Police Officer | Law Enforcement | Patrol Officer | Deputy",
+    summaryHint: "Highlight patrol experience, community policing, report writing, and de-escalation training.",
+    signals: [["police officer",18],["law enforcement",15],["patrol",10],["deputy",10],["peace officer",10],["post certified",8],["report writing",8],["traffic stop",6],["arrest",6],["investigation",8],["community policing",8],["de-escalation",8],["firearm",6],["body camera",6]], threshold: 25,
+  },
+
+  /* ═══════════════════════════════════════════════════════════════
+     WELLNESS & ALTERNATIVE HEALTH
+     ═══════════════════════════════════════════════════════════════ */
+  {
+    id: "massage-therapist", label: "Massage Therapist",
+    tagline: "Massage Therapist | LMT | Licensed Massage Therapist",
+    summaryHint: "Highlight modalities (deep tissue, Swedish, sports), client retention, and licensure.",
+    signals: [["massage therapist",18],["lmt",15],["massage",12],["deep tissue",10],["swedish",8],["sports massage",8],["trigger point",8],["prenatal",6],["hot stone",6],["relaxation",5],["client retention",8],["spa",6],["wellness",5],["bodywork",8]], threshold: 20,
+  },
+  {
+    id: "yoga-instructor", label: "Yoga / Pilates Instructor",
+    tagline: "Yoga Instructor | Pilates Instructor | Group Fitness Instructor",
+    summaryHint: "Focus on certifications (RYT-200/500), class sizes, student retention, and specialized populations.",
+    signals: [["yoga instructor",18],["yoga",12],["pilates",12],["ryt",10],["group fitness",10],["class",6],["flow",5],["vinyasa",8],["hatha",6],["power yoga",6],["meditation",6],["mindfulness",5],["studio",6],["mat",5],["reformer",8]], threshold: 20,
+  },
+
+  /* ═══════════════════════════════════════════════════════════════
+     CONTENT & MEDIA
+     ═══════════════════════════════════════════════════════════════ */
+  {
+    id: "content-creator", label: "Content Creator / Influencer",
+    tagline: "Content Creator | Influencer | YouTuber | Streamer",
+    summaryHint: "Highlight audience size, engagement rates, brand partnerships, and content production skills.",
+    signals: [["content creator",18],["influencer",12],["youtuber",10],["streamer",10],["tiktok",8],["youtube",8],["instagram",6],["subscriber",8],["follower",6],["brand deal",8],["sponsorship",8],["editing",6],["thumbnail",5],["monetization",6],["engagement rate",8]], threshold: 20,
+  },
+  {
+    id: "copywriter", label: "Copywriter / Content Writer",
+    tagline: "Copywriter | Content Writer | Technical Writer | Blog Writer",
+    summaryHint: "Lead with content types, industries served, SEO knowledge, and measurable engagement results.",
+    signals: [["copywriter",18],["content writer",15],["technical writer",12],["blog",8],["article",6],["seo",8],["copy",8],["headline",6],["cta",6],["landing page",8],["email copy",8],["tone of voice",6],["ap style",6],["grammar",5],["proofread",6]], threshold: 20,
+  },
+
+  /* ═══════════════════════════════════════════════════════════════
+     NONPROFIT & COMMUNITY
+     ═══════════════════════════════════════════════════════════════ */
+  {
+    id: "nonprofit-coordinator", label: "Nonprofit Coordinator",
+    tagline: "Program Coordinator | Nonprofit Associate | Community Organizer",
+    summaryHint: "Highlight program management, fundraising support, volunteer coordination, and community impact.",
+    signals: [["nonprofit",15],["program coordinator",15],["community organizer",12],["grant",10],["fundraising",10],["volunteer",10],["outreach",8],["donor",8],["501c3",6],["mission",5],["advocacy",8],["community engagement",8],["event planning",6],["stakeholder",6]], threshold: 25,
+  },
 ];
 
 /**
@@ -893,19 +1137,41 @@ export function analyzeTransferableSkills(
 
   for (const rule of ROLE_RULES) {
     let score = 0;
-    /* Check if the desired role text matches the rule's label/tagline */
     const ruleText = `${rule.id} ${rule.label} ${rule.tagline}`.toLowerCase();
-    const desiredWords = desired.split(/\s+/);
-    for (const word of desiredWords) {
-      if (word.length > 2 && ruleText.includes(word)) score += 10;
+
+    /* Exact full-phrase match is strongest */
+    if (ruleText.includes(desired)) {
+      score += 100;
     }
-    /* Exact label match is a strong signal */
-    if (ruleText.includes(desired)) score += 50;
+
+    /* Check label specifically — "dental assistant" should match label "Dental Assistant" */
+    if (rule.label.toLowerCase().includes(desired)) {
+      score += 80;
+    }
+    if (desired.includes(rule.label.toLowerCase())) {
+      score += 80;
+    }
+
+    /* Multi-word bigram matching: check consecutive word pairs from the desired role */
+    const desiredWords = desired.split(/\s+/).filter(w => w.length > 2);
+    for (let i = 0; i < desiredWords.length - 1; i++) {
+      const bigram = desiredWords[i] + " " + desiredWords[i + 1];
+      if (ruleText.includes(bigram)) score += 25;
+    }
+
+    /* Single word matches (weaker, only for words > 3 chars to avoid noise) */
+    for (const word of desiredWords) {
+      if (word.length > 3 && ruleText.includes(word)) score += 5;
+    }
+
     if (score > bestScore) {
       bestScore = score;
       bestRule = rule;
     }
   }
+
+  /* Only accept a match if there was meaningful overlap */
+  if (bestScore < 5) bestRule = null;
 
   /* ── 2. Find direct matches (resume keywords that the target role values) ── */
   const directMatches: string[] = [];
