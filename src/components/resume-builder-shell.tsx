@@ -98,6 +98,13 @@ const SECTION_HEADINGS = [
 ] as const;
 
 /**
+ * Clean LaTeX-style hyphenation artifacts: "envi- ronment" → "environment"
+ */
+function cleanHyphenation(text: string): string {
+  return text.replace(/(\w)- (\w)/g, '$1$2');
+}
+
+/**
  * Split raw resume text into a map of { sectionName → content }.
  * Works with UPPERCASE headings (e.g. "PROFESSIONAL EXPERIENCE"),
  * Title Case, or lowercase.  The key stored in the map is always
@@ -212,9 +219,10 @@ function parseExperienceEntries(block: string): ExperienceEntry[] {
         const [s, ed] = dm[0].split(/\s*[-–—]\s*/);
         startDate = s?.trim() || "";
         endDate = ed?.trim() || "";
-        /* title is everything before the date, or on a pipe */
-        const titlePart = cl.replace(dm[0], "").replace(/[|]/g, "").trim();
-        if (titlePart) title = titlePart;
+        /* title is text BEFORE the date only */
+        const dateIdx = cl.indexOf(dm[0]);
+        const beforeDate = cl.substring(0, dateIdx).replace(/[|]/g, "").trim();
+        if (beforeDate) title = beforeDate;
       } else if (!title && !cl.startsWith("-")) {
         title = cl.replace(/[|]/g, "").trim();
       }
@@ -257,7 +265,7 @@ function parseExperienceEntries(block: string): ExperienceEntry[] {
 
     /* Clean title: remove any trailing inline bullet content that got mixed in */
     let cleanTitle = title;
-    if (cleanTitle.includes(" - ") && cleanTitle.length > 60) {
+    if (cleanTitle.includes(" - ") && cleanTitle.length > 35) {
       cleanTitle = cleanTitle.split(/\s+-\s+/)[0]?.trim() || cleanTitle;
     }
 
@@ -272,7 +280,15 @@ function parseExperienceEntries(block: string): ExperienceEntry[] {
     });
   }
 
-  return entries;
+  /* Deduplicate: if two consecutive entries have the same company+title, keep only the first */
+  const deduped: ExperienceEntry[] = [];
+  for (const entry of entries) {
+    const isDupe = deduped.some(
+      (existing) => existing.company === entry.company && existing.title === entry.title
+    );
+    if (!isDupe) deduped.push(entry);
+  }
+  return deduped;
 }
 
 /** Parse project entries from the projects section. */
@@ -321,7 +337,7 @@ function parseProjectEntries(block: string): ProjectEntry[] {
 }
 
 function parseResumeText(raw: string, current: ResumeData): ResumeData {
-  const text = raw.replace(/\r/g, "").trim();
+  const text = cleanHyphenation(raw.replace(/\r/g, "")).trim();
   const sections = splitSections(text);
   const header = sections.get("__header__") || "";
   const headerLines = header.split("\n").map((l) => l.trim()).filter(Boolean);
@@ -369,11 +385,12 @@ function parseResumeText(raw: string, current: ResumeData): ResumeData {
   const summary = summaryBlock.replace(/\n/g, " ").replace(/\s+/g, " ").trim() || current.summary;
 
   /* ── Skills ── */
-  const skillsBlock =
+  const skillsBlock = (
     sections.get("technical skills") ||
     sections.get("core skills") ||
     sections.get("skills") ||
-    "";
+    ""
+  ).replace(/\n/g, " ").replace(/\s+/g, " ");
   const langMatch = skillsBlock.match(/(?:programming\s+languages?|languages?)\s*:\s*([^\n]+)/i);
   const toolMatch = skillsBlock.match(/(?:platforms?|tools?|systems?|software|technologies)[\s,&and]*(?:tools?|systems?|software|platforms?)?\s*:\s*([^\n]+)/i);
   const languages = langMatch
