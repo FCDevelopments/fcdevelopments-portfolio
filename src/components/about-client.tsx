@@ -201,19 +201,18 @@ export function AboutClient() {
               in the ring, or working on ideas that bring emerging tech closer to everyday life.
             </p>
           </Reveal>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-5">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
             {interests.map((item, i) => (
               <Reveal key={item.label} variant="fade-up" delay={i * 0.08}>
-                <div className="card-chrome text-center py-8 px-4 group hover:border-[var(--brand)]/30 transition-all duration-300">
+                <div className="card-chrome text-center p-4 group hover:border-[var(--brand)]/30 transition-all duration-300">
                   <Image
                     src={item.icon}
                     alt={item.label}
-                    width={64}
-                    height={64}
-                    className="mx-auto mb-4 opacity-70 group-hover:opacity-100 transition-opacity duration-300"
+                    width={36}
+                    height={36}
+                    className="mx-auto mb-2 opacity-60 group-hover:opacity-90 transition-opacity duration-300"
                   />
-                  <h3 className="text-sm font-bold text-[var(--foreground)] mb-1">{item.label}</h3>
-                  <p className="text-xs text-[var(--muted)] leading-relaxed">{item.description}</p>
+                  <h3 className="text-xs font-semibold text-[var(--muted-strong)]">{item.label}</h3>
                 </div>
               </Reveal>
             ))}

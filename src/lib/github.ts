@@ -56,6 +56,62 @@ const REPO_OVERRIDES: Record<string, Partial<Project> & { hidden?: boolean }> = 
       "SkillsUSA California Regional Gold Medal winning website. Modern responsive design for a local plumbing business.",
     badge: "Gold Medal",
   },
+  "ticket-triage-tagging-engine": {
+    name: "Ticket Triage Engine",
+    summary:
+      "Keyword-based IT support ticket triage and tagging rules engine. Reads CSV exports, assigns priority + routing, outputs triage reports.",
+    badge: "Operations",
+    tech: ["Python", "Automation", "CLI"],
+  },
+  "quote-followup-autopilot": {
+    name: "Quote Follow-up Autopilot",
+    summary:
+      "Revenue-focused workflow tool for contractors, freelancers, and service businesses to automate quote follow-up and deposit collection.",
+    badge: "Web App",
+    tech: ["Next.js", "TypeScript", "SaaS"],
+  },
+  "bar-estimate-compliance-writer": {
+    name: "BAR Estimate Compliance Writer",
+    summary:
+      "California-focused estimate drafting product that helps repair shops and dealerships produce customer-friendly, compliance-aware repair estimates.",
+    badge: "Web App",
+    tech: ["Next.js", "TypeScript", "Tailwind CSS"],
+  },
+  "customer-update-hub": {
+    name: "Customer Update Hub",
+    summary:
+      "Service workflow communication product that helps dealerships, repair shops, and field-service teams reduce status calls and standardize customer updates.",
+    badge: "Web App",
+    tech: ["Next.js", "TypeScript", "Workflow Automation"],
+  },
+  "supportops-copilot": {
+    name: "SupportOps Copilot",
+    summary:
+      "CLI tool that processes raw support exports into categorized summaries and actionable reporting artifacts for operations teams.",
+    badge: "Operations",
+    tech: ["Python", "CLI", "Automation"],
+  },
+  "zendesk-csv-helper": {
+    name: "Zendesk CSV Helper",
+    summary:
+      "Utility for cleaning, filtering, and transforming Zendesk ticket exports into structured, actionable CSV data for reporting and analysis.",
+    badge: "Operations",
+    tech: ["Python", "CSV", "Automation"],
+  },
+  "rest-api-csv-json-template": {
+    name: "REST API CSV/JSON Template",
+    summary:
+      "Reusable template for building REST API integrations that consume or produce CSV and JSON data, with structured error handling.",
+    badge: "Operations",
+    tech: ["Python", "REST API", "CSV"],
+  },
+  "rest-to-csv": {
+    name: "REST to CSV Converter",
+    summary:
+      "Lightweight utility to fetch data from REST API endpoints and export results directly to structured CSV files.",
+    badge: "Operations",
+    tech: ["Python", "REST API", "CSV"],
+  },
   // Hide forks or irrelevant repos by name:
   // "some-fork": { hidden: true },
 };
