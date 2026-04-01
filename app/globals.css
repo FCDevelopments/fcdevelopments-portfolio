@@ -790,6 +790,32 @@ input[type="radio"], input[type="checkbox"] { accent-color: var(--brand); cursor
   min-height: auto;
 }
 
+/* ═══════ Summary Coach ═══════ */
+.summary-coach {
+  border-radius: 0.6rem; border: 1px solid rgba(201, 165, 78, 0.15);
+  background: rgba(201, 165, 78, 0.04); padding: 0.75rem 0.9rem;
+}
+.summary-coach-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em; color: var(--brand); margin-bottom: 0.35rem; }
+.summary-coach-text { font-size: 0.79rem; line-height: 1.55; color: var(--muted-strong); margin-bottom: 0.35rem; }
+.summary-coach-text strong { color: var(--brand); font-weight: 600; }
+.summary-coach-tip { font-size: 0.72rem; color: var(--muted); font-style: italic; }
+
+/* ═══════ ATS Score ═══════ */
+.ats-results { margin-top: 0.75rem; display: flex; flex-direction: column; gap: 0.75rem; }
+.ats-score-row { display: flex; justify-content: space-between; align-items: center; }
+.ats-score-label { font-size: 0.78rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+.ats-score-value { font-size: 1.05rem; font-weight: 800; }
+.ats-score-good { color: #4ade80; }
+.ats-score-ok { color: #fbbf24; }
+.ats-score-low { color: #f87171; }
+.ats-score-bar-track { height: 5px; border-radius: 99px; background: rgba(255,255,255,0.06); overflow: hidden; }
+.ats-score-bar-fill { height: 100%; border-radius: 99px; transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+.ats-fill-good { background: #4ade80; }
+.ats-fill-ok { background: #fbbf24; }
+.ats-fill-low { background: #f87171; }
+.ats-group { display: flex; flex-direction: column; gap: 0.5rem; }
+.ats-group-label { font-size: 0.73rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+
 /* ═══════ Print ═══════ */
 @media print {
   @page { margin: 0.5in 0.6in; size: letter; }

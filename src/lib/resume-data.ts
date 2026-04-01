@@ -81,11 +81,11 @@ export const defaultResumeData: ResumeData = {
     website: "yourportfolio.com",
   },
   summary:
-    "Write a short, role-focused summary that highlights your strongest experience, tools, and the kind of work you want next.",
+    "Results-driven [your field] professional with [X] years of experience in [core skill areas]. Track record of [specific achievement type — e.g. reducing ticket resolution time, improving onboarding workflows, building automation tools]. Combines hands-on [domain] expertise with [secondary strength] to deliver measurable outcomes in fast-paced environments.",
   skills: {
     languages: ["Python", "JavaScript", "SQL"],
-    tools: ["Zendesk", "ServiceNow", "Google Workspace"],
-    strengths: ["Customer Support", "Troubleshooting", "Workflow Improvement"],
+    tools: ["Zendesk", "Okta", "Azure AD", "ServiceNow", "Google Workspace"],
+    strengths: ["Troubleshooting", "Workflow Automation", "Documentation", "Process Improvement"],
   },
   experience: [
     {
@@ -96,8 +96,9 @@ export const defaultResumeData: ResumeData = {
       startDate: "Jan 2024",
       endDate: "Present",
       bullets: [
-        "Describe a measurable result you achieved using strong action verbs and clear business impact.",
-        "Mention the tools, systems, or workflows you improved.",
+        "Built or improved [system/workflow/tool], reducing [pain point] by [X%] and saving [team/dept] [N] hours per [week/month].",
+        "Managed [scope — e.g. 50+ endpoints, 200+ accounts, 100+ tickets/day] with [outcome — e.g. 99% uptime, 0 security incidents, 30% faster resolution].",
+        "Led or contributed to [initiative/project] that [measurable business outcome].",
       ],
     },
   ],
@@ -105,10 +106,11 @@ export const defaultResumeData: ResumeData = {
     {
       id: "proj-1",
       name: "Project Name",
-      stack: "Tools / Stack",
+      stack: "Tools / Stack Used",
       link: "",
       bullets: [
-        "Describe a project, what you built, and the value it created.",
+        "Built [what it is] to solve [specific problem] for [target user/team/business].",
+        "Implemented [key technical detail or approach] that enabled [specific capability or outcome].",
       ],
     },
   ],
@@ -121,7 +123,7 @@ export const defaultResumeData: ResumeData = {
       startDate: "",
       endDate: "",
       details: [
-        "Relevant coursework, honors, certifications, or concentration details.",
+        "Relevant coursework, honors, certifications, or concentration area.",
       ],
     },
   ],

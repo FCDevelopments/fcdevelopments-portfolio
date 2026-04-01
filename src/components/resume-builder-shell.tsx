@@ -543,11 +543,48 @@ export function ResumeBuilderShell() {
     [draft]
   );
 
-  const matchedKeywords = useMemo(() => {
-    if (!jobDescription.trim()) return [] as string[];
+  const atsAnalysis = useMemo(() => {
+    if (!jobDescription.trim()) return null;
+    const jd = jobDescription.toLowerCase();
+
+    /* Build full resume corpus for matching */
+    const resumeCorpus = [
+      draft.contact.targetTitle,
+      draft.summary,
+      ...draft.skills.languages,
+      ...draft.skills.tools,
+      ...draft.skills.strengths,
+      ...draft.experience.flatMap((e) => [e.title, e.company, ...e.bullets]),
+      ...draft.projects.flatMap((p) => [p.name, p.stack, ...p.bullets]),
+      ...draft.certifications.map((c) => c.name),
+    ].filter(Boolean).join(" ").toLowerCase();
+
+    /* Skill pool for keyword matching */
     const pool = [...draft.skills.languages, ...draft.skills.tools, ...draft.skills.strengths, draft.contact.targetTitle].filter(Boolean);
-    return [...new Set(pool.filter((k) => jobDescription.toLowerCase().includes(k.toLowerCase())))];
+    const matched = [...new Set(pool.filter((k) => jd.includes(k.toLowerCase())))];
+
+    /* Extract meaningful words from JD (4+ chars, not stopwords) */
+    const stopwords = new Set(["with","that","this","from","have","your","will","their","they","what","when","were","also","into","each","more","than","about","after","before","other","which","where","there","these","those","through","between","during","within","without","against","across","while","some","such","been","over","under","both","either","among","being","having","should","would","could","shall","must","need","doing","done","make","made","take","taken","give","given","able","like","well","best","good","strong","work","working","team","teams","business"]);
+    const jdWords = jd.match(/\b[a-z]{4,}\b/g) || [];
+    const jdWordFreq = new Map<string, number>();
+    for (const w of jdWords) {
+      if (!stopwords.has(w)) jdWordFreq.set(w, (jdWordFreq.get(w) || 0) + 1);
+    }
+
+    /* Find JD keywords missing from resume (appear 2+ times in JD, not in resume corpus) */
+    const missingKeywords = [...jdWordFreq.entries()]
+      .filter(([word, freq]) => freq >= 2 && !resumeCorpus.includes(word))
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+      .map(([word]) => word);
+
+    /* Simple score: matched / total unique skill keywords in resume */
+    const score = pool.length > 0 ? Math.round((matched.length / Math.max(pool.length, 1)) * 100) : 0;
+
+    return { matched, missingKeywords, score };
   }, [jobDescription, draft]);
+
+  const matchedKeywords = atsAnalysis?.matched ?? [];
 
   /* contact */
   const setContact = (field: keyof ResumeData["contact"], value: string) =>
@@ -883,11 +920,59 @@ export function ResumeBuilderShell() {
           <div className="builder-card">
             <p className="eyebrow">ATS Check</p>
             <h2>Job description match</h2>
-            <textarea className="builder-textarea" value={jobDescription} onChange={(e) => setJobDescription(e.target.value)} placeholder="Paste a job description to see keyword overlap…" />
-            <div className="builder-inline-note">
-              <strong>Keyword matches:</strong>{" "}
-              {matchedKeywords.length ? matchedKeywords.join(" • ") : "No matches yet. Paste a job description."}
-            </div>
+            <textarea className="builder-textarea" value={jobDescription} onChange={(e) => setJobDescription(e.target.value)} placeholder="Paste a job description to see keyword overlap, match score, and gaps…" />
+            {atsAnalysis ? (
+              <div className="ats-results">
+                {/* Score bar */}
+                <div className="ats-score-row">
+                  <span className="ats-score-label">Keyword match score</span>
+                  <span className={`ats-score-value ${atsAnalysis.score >= 70 ? "ats-score-good" : atsAnalysis.score >= 40 ? "ats-score-ok" : "ats-score-low"}`}>
+                    {atsAnalysis.score}%
+                  </span>
+                </div>
+                <div className="ats-score-bar-track">
+                  <div
+                    className={`ats-score-bar-fill ${atsAnalysis.score >= 70 ? "ats-fill-good" : atsAnalysis.score >= 40 ? "ats-fill-ok" : "ats-fill-low"}`}
+                    style={{ width: `${Math.min(atsAnalysis.score, 100)}%` }}
+                  />
+                </div>
+
+                {/* Matched keywords */}
+                {atsAnalysis.matched.length > 0 && (
+                  <div className="ats-group">
+                    <p className="ats-group-label">✓ Found in your resume</p>
+                    <div className="transfer-chips">
+                      {atsAnalysis.matched.map((k) => (
+                        <span key={k} className="signal-chip signal-chip-match">{k}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Missing keywords */}
+                {atsAnalysis.missingKeywords.length > 0 && (
+                  <div className="ats-group">
+                    <p className="ats-group-label">⚠ Consider adding these terms</p>
+                    <div className="transfer-chips">
+                      {atsAnalysis.missingKeywords.map((k) => (
+                        <span key={k} className="signal-chip signal-chip-gap">{k}</span>
+                      ))}
+                    </div>
+                    <p className="muted-copy mt-2" style={{ fontSize: "0.73rem" }}>
+                      These words appear frequently in the JD but not in your resume.
+                    </p>
+                  </div>
+                )}
+
+                {atsAnalysis.matched.length === 0 && (
+                  <p className="muted-copy mt-2">No skill keyword matches yet — check that your skills section is populated.</p>
+                )}
+              </div>
+            ) : (
+              <div className="builder-inline-note">
+                Paste a job description above to see your keyword match score, matched skills, and gaps.
+              </div>
+            )}
           </div>
 
         </section>
@@ -972,6 +1057,15 @@ export function ResumeBuilderShell() {
               <input className="builder-input" value={draft.contact.website} onChange={(e) => setContact("website", e.target.value)} placeholder="Website" />
             </div>
             <textarea className="builder-textarea mt-3" value={draft.summary} onChange={(e) => setDraft((d) => ({ ...d, summary: e.target.value }))} placeholder="Professional summary…" />
+            {/* Summary writing coach */}
+            <div className="summary-coach mt-2">
+              <p className="summary-coach-label">✦ Strong summary formula</p>
+              <p className="summary-coach-text">
+                <strong>[Title/field] professional</strong> with <strong>[X] years</strong> of experience in <strong>[2–3 core areas]</strong>.
+                Track record of <strong>[specific result type]</strong>. Combines <strong>[skill 1]</strong> with <strong>[skill 2]</strong> to deliver <strong>[outcome]</strong> in <strong>[environment type]</strong>.
+              </p>
+              <p className="summary-coach-tip">Keep it to 2–3 sentences. Role-specific, not generic. Lead with your strongest identity.</p>
+            </div>
           </div>
 
           {/* SKILLS */}
@@ -1007,7 +1101,18 @@ export function ResumeBuilderShell() {
                   </div>
                   {entry.bullets.map((bullet, bi) => (
                     <div key={`${entry.id}-${bi}`} className="bullet-row">
-                      <textarea className="builder-textarea compact" value={bullet} onChange={(e) => setExpBullet(ei, bi, e.target.value)} placeholder={`Bullet ${bi + 1}`} />
+                      <textarea
+                        className="builder-textarea compact"
+                        value={bullet}
+                        onChange={(e) => setExpBullet(ei, bi, e.target.value)}
+                        placeholder={
+                          bi === 0
+                            ? "Start with an action verb + quantify: 'Reduced ticket resolution time by 30% by building…'"
+                            : bi === 1
+                            ? "Include scope: 'Managed 50+ endpoints / 200+ accounts / 100+ daily tickets…'"
+                            : "Add business impact: 'Saving 10+ hours/month', 'improving X by Y%', 'supporting N users…'"
+                        }
+                      />
                       <button className="button-secondary danger-button" type="button" onClick={() => removeExpBullet(ei, bi)}>Remove</button>
                     </div>
                   ))}

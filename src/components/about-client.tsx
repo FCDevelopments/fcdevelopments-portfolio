@@ -8,7 +8,7 @@ const experience = [
   {
     role: "Junior IT Administrator",
     company: "OMTech — Santa Ana, CA",
-    period: "Feb 2025 – Jan 2026",
+    period: "Mar 2025 – Feb 2026",
     bullets: [
       "Managed MDM infrastructure across 120+ endpoints using Kandji and Azure AD, reducing provisioning time by 40%.",
       "Built Python automation tools that identified critical ERP data discrepancies, saving operations 15+ hours per month.",
@@ -68,15 +68,15 @@ export function AboutClient() {
                   <span className="text-gradient-gold">Castaneda.</span>
                 </h1>
                 <p className="text-lg text-[var(--muted)] leading-relaxed mb-4">
-                  IT Professional, Software Developer, and builder of practical tools based in Orange County, California.
-                  I come from a hands-on IT background — managing infrastructure, automating operations, and solving
-                  problems that slow teams down.
+                  IT and security-minded builder based in Cerritos, California with a hands-on background in IT operations,
+                  identity-adjacent systems, automation, and practical software development. I focus on solving workflow problems
+                  that slow teams down while building toward long-term work in cybersecurity, IAM, and modern IT operations.
                 </p>
                 <p className="text-[var(--muted)] leading-relaxed mb-4">
                   Today I&apos;m focused on bridging the gap between emerging AI capabilities and real-world implementation.
-                  Co-developing <span className="text-[var(--foreground)] font-semibold">OpenClaw</span> — an autonomous development
-                  platform powered by Claude AI — and building the <span className="text-[var(--foreground)] font-semibold">FCDevelopments</span> ecosystem
-                  of career tools, workflow automation, and developer utilities.
+                  The goal is to use software and automation as proof of practical problem-solving while positioning myself for
+                  stronger work in cybersecurity, IAM, and IT. FCDevelopments is where that mix shows up: career tools,
+                  workflow products, and hands-on systems-minded software with real-world applicability.
                 </p>
                 <p className="text-[var(--muted)] leading-relaxed">
                   I believe the best technology disappears into the workflow. It should feel effortless, respect your
@@ -163,14 +163,14 @@ export function AboutClient() {
               <div className="card-chrome">
                 <div className="flex flex-col md:flex-row md:items-start gap-6">
                   <div className="md:w-1/3 shrink-0">
-                    <p className="text-xs font-semibold uppercase tracking-widest text-[var(--brand)] mb-1">Dec 2024 – May 2026</p>
-                    <h3 className="text-lg font-bold">Associate of Science</h3>
+                    <p className="text-xs font-semibold uppercase tracking-widest text-[var(--brand)] mb-1">Jan 2025 – May 2027</p>
+                    <h3 className="text-lg font-bold">Associate of Science in Computer Science</h3>
                     <p className="text-sm text-[var(--muted)]">Irvine Valley College — Irvine, CA</p>
                   </div>
                   <ul className="md:w-2/3 space-y-2">
                     <li className="text-[var(--muted)] text-sm leading-relaxed flex gap-2">
                       <span className="text-[var(--brand)] mt-1 shrink-0">-</span>
-                      <span>GPA: 3.6/4.0 — Computer Science concentration with coursework in Java, C Programming, and Computer Information Management.</span>
+                      <span>Computer Science coursework focused on programming fundamentals, systems thinking, and practical application development.</span>
                     </li>
                     <li className="text-[var(--muted)] text-sm leading-relaxed flex gap-2">
                       <span className="text-[var(--brand)] mt-1 shrink-0">-</span>
@@ -178,7 +178,7 @@ export function AboutClient() {
                     </li>
                     <li className="text-[var(--muted)] text-sm leading-relaxed flex gap-2">
                       <span className="text-[var(--brand)] mt-1 shrink-0">-</span>
-                      <span>Strong foundation in systems thinking, data structures, and real-world application development.</span>
+                      <span>Building a stronger foundation in software, automation, and production-ready web application development.</span>
                     </li>
                   </ul>
                 </div>

@@ -51,18 +51,18 @@ export function HomeClient({ projects, skills }: { projects: Project[]; skills: 
 
             <Reveal variant="fade-up" delay={0.2}>
               <h1 className="text-5xl sm:text-6xl lg:text-8xl font-extrabold tracking-tight leading-[0.95] mb-6">
-                <span className="text-[var(--foreground)]">Build your </span>
-                <span className="text-gradient-gold">career</span>
+                <span className="text-[var(--foreground)]">Build practical </span>
+                <span className="text-gradient-gold">software</span>
                 <br />
-                <span className="text-[var(--foreground)]">with precision.</span>
+                <span className="text-[var(--foreground)]">that solves real problems.</span>
               </h1>
             </Reveal>
 
             <Reveal variant="fade-up" delay={0.4}>
-              <p className="text-lg lg:text-xl text-[var(--muted)] max-w-2xl mb-10 leading-relaxed">
-                Free, privacy-first resume builder and developer tools.
-                Crafted by Fabian Castaneda in Orange County, CA.
-                No accounts. No tracking. Just tools that work.
+              <p className="text-lg lg:text-xl text-[var(--muted)] max-w-3xl mb-10 leading-relaxed">
+                Portfolio, products, and workflow tools by Fabian Castaneda — IT systems professional and
+                builder focused on automation, operations tooling, and practical software that solves
+                real business problems.
               </p>
             </Reveal>
 
@@ -94,19 +94,19 @@ export function HomeClient({ projects, skills }: { projects: Project[]; skills: 
             <Reveal variant="fade-up" delay={0}>
               <div className="text-center">
                 <p className="stat-number"><CountUp target={6} suffix="+" /></p>
-                <p className="stat-label">Projects Shipped</p>
+                <p className="stat-label">Products Built</p>
               </div>
             </Reveal>
             <Reveal variant="fade-up" delay={0.1}>
               <div className="text-center">
                 <p className="stat-number"><CountUp target={2} suffix="+" /></p>
-                <p className="stat-label">Years Experience</p>
+                <p className="stat-label">Years in IT &amp; Ops</p>
               </div>
             </Reveal>
             <Reveal variant="fade-up" delay={0.2}>
               <div className="text-center">
-                <p className="stat-number"><CountUp target={15} suffix="+" /></p>
-                <p className="stat-label">Technologies</p>
+                <p className="stat-number"><CountUp target={18} suffix="+" /></p>
+                <p className="stat-label">Workflow &amp; Dev Tools</p>
               </div>
             </Reveal>
             <Reveal variant="fade-up" delay={0.3}>
@@ -132,8 +132,9 @@ export function HomeClient({ projects, skills }: { projects: Project[]; skills: 
                   <span className="text-gradient-gold">Zero friction.</span>
                 </h2>
                 <p className="text-[var(--muted)] text-lg leading-relaxed mb-8">
-                  Upload your content, pick a template, preview in real-time, and export a clean PDF.
-                  Everything runs in your browser — your data never leaves your machine.
+                  Upload your resume or start from scratch. Paste a job description for instant keyword
+                  matching. Get role recommendations, transferable skill analysis, and a clean PDF export
+                  — all in your browser, no account required.
                 </p>
                 <div className="flex flex-wrap gap-4">
                   <Link href="/resume-builder" className="button-primary">
@@ -260,14 +261,14 @@ export function HomeClient({ projects, skills }: { projects: Project[]; skills: 
                 <span className="text-gradient-gold">Castaneda.</span>
               </h2>
               <p className="text-[var(--muted)] text-lg leading-relaxed mb-4">
-                IT Professional and Software Developer based in Orange County, CA.
-                I come from a hands-on IT background — managing infrastructure, automating
-                operations, and building tools that solve real problems for real people.
+                Systems-minded builder based in Cerritos, CA with a background in IT operations,
+                workflow automation, and practical software development. I focus on tools that make
+                messy operational work clearer, faster, and more useful.
               </p>
               <p className="text-[var(--muted)] leading-relaxed mb-4">
-                Currently co-developing OpenClaw AI and building the FCDevelopments ecosystem.
-                When I&apos;m not coding, you&apos;ll find me hiking trails, training Muay Thai,
-                or hanging out with my dog.
+                FCDevelopments is evolving beyond a portfolio into a growing product studio — spanning
+                career tools, service-business software, and AI-assisted workflow products with real-world
+                commercial potential.
               </p>
               <Link href="/about" className="nav-link text-[var(--brand)] text-sm">
                 My Full Story →
@@ -279,7 +280,7 @@ export function HomeClient({ projects, skills }: { projects: Project[]; skills: 
                 <div className="card-chrome p-6">
                   <p className="text-[var(--brand)] text-sm font-semibold uppercase tracking-wider mb-2">Current</p>
                   <h3 className="text-lg font-bold mb-1">AI &amp; Dev</h3>
-                  <p className="text-sm text-[var(--muted)]">OpenClaw, Claude AI, MCP Servers</p>
+                  <p className="text-sm text-[var(--muted)]">OpenClaw, OpenAI Codex, IAM-oriented automation</p>
                 </div>
                 <div className="card-chrome p-6">
                   <p className="text-[var(--brand)] text-sm font-semibold uppercase tracking-wider mb-2">Products</p>
@@ -289,7 +290,7 @@ export function HomeClient({ projects, skills }: { projects: Project[]; skills: 
                 <div className="card-chrome p-6">
                   <p className="text-[var(--brand)] text-sm font-semibold uppercase tracking-wider mb-2">Background</p>
                   <h3 className="text-lg font-bold mb-1">IT Ops</h3>
-                  <p className="text-sm text-[var(--muted)]">Okta, Azure AD, MDM, Systems</p>
+                  <p className="text-sm text-[var(--muted)]">Okta, Azure AD, IAM, Systems</p>
                 </div>
                 <div className="card-chrome p-6">
                   <p className="text-[var(--brand)] text-sm font-semibold uppercase tracking-wider mb-2">Award</p>

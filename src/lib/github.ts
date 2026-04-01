@@ -40,7 +40,7 @@ const REPO_OVERRIDES: Record<string, Partial<Project> & { hidden?: boolean }> = 
   "fcdevelopments-portfolio": {
     name: "FCDevelopments Portfolio",
     summary:
-      "This website — a privacy-first portfolio and resume builder with ATS-friendly templates, smart role recommendations, and PDF export.",
+      "Founder-style portfolio and product studio site showcasing practical software, workflow tools, resume software, and vertical SaaS concepts.",
     badge: "Flagship",
     link: "/resume-builder",
   },
@@ -63,6 +63,8 @@ const REPO_OVERRIDES: Record<string, Partial<Project> & { hidden?: boolean }> = 
 /**
  * Projects that don't live on GitHub but should appear on the site.
  */
+const MANUAL_PUSHED_AT = "2026-03-30T15:00:00.000Z";
+
 const MANUAL_PROJECTS: Project[] = [
   {
     name: "SupportOps Copilot",
@@ -72,7 +74,43 @@ const MANUAL_PROJECTS: Project[] = [
     badge: "Operations",
     link: "https://github.com/FCDevelopments",
     github: "https://github.com/FCDevelopments",
-    pushedAt: new Date().toISOString(),
+    pushedAt: MANUAL_PUSHED_AT,
+    stars: 0,
+    source: "manual",
+  },
+  {
+    name: "BAR Estimate Compliance Writer",
+    summary:
+      "California-focused estimate drafting product that helps repair shops and dealership service departments produce customer-friendly, compliance-aware repair estimates.",
+    tech: ["Next.js", "TypeScript", "Tailwind CSS"],
+    badge: "Web App",
+    link: "https://github.com/FCDevelopments/bar-estimate-compliance-writer",
+    github: "https://github.com/FCDevelopments/bar-estimate-compliance-writer",
+    pushedAt: MANUAL_PUSHED_AT,
+    stars: 0,
+    source: "manual",
+  },
+  {
+    name: "Customer Update Hub",
+    summary:
+      "Service workflow communication product that helps dealerships, repair shops, and field-service teams reduce status calls and standardize customer updates.",
+    tech: ["Next.js", "TypeScript", "Workflow Automation"],
+    badge: "Web App",
+    link: "https://github.com/FCDevelopments/customer-update-hub",
+    github: "https://github.com/FCDevelopments/customer-update-hub",
+    pushedAt: MANUAL_PUSHED_AT,
+    stars: 0,
+    source: "manual",
+  },
+  {
+    name: "Quote Follow-up Autopilot",
+    summary:
+      "Revenue-focused workflow tool for contractors, freelancers, and service businesses to automate quote follow-up and deposit collection.",
+    tech: ["Next.js", "TypeScript", "SaaS"],
+    badge: "Web App",
+    link: "https://github.com/FCDevelopments/quote-followup-autopilot",
+    github: "https://github.com/FCDevelopments/quote-followup-autopilot",
+    pushedAt: MANUAL_PUSHED_AT,
     stars: 0,
     source: "manual",
   },
