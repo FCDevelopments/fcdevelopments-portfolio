@@ -47,7 +47,7 @@ const values = [
 const interests = [
   { icon: "/images/hiking.svg", label: "Hiking", description: "Exploring trails across Southern California" },
   { icon: "/images/muaythai.svg", label: "Muay Thai", description: "Training discipline and mental toughness" },
-  { icon: "/images/dog.svg", label: "My Dog", description: "Best co-pilot for every adventure" },
+  { icon: "/images/dog.svg", label: "My Dog", description: "Best co-pilot for every adventure", className: "pb-8" },
   { icon: "/images/friends.svg", label: "Friends", description: "Building memories with great people" },
   { icon: "/images/code.svg", label: "Future Tech", description: "Developing tech with real-world impact" },
 ];
@@ -68,19 +68,21 @@ export function AboutClient() {
                   <span className="text-gradient-gold">Castaneda.</span>
                 </h1>
                 <p className="text-lg text-[var(--muted)] leading-relaxed mb-4">
-                  IT and security-minded builder based in Cerritos, California with a hands-on background in IT operations,
-                  identity-adjacent systems, automation, and practical software development. I focus on solving workflow problems
-                  that slow teams down while building toward long-term work in cybersecurity, IAM, and modern IT operations.
+                  Operations-ready IT professional based in Cerritos, California, specializing in
+                  cybersecurity, identity &amp; access management, and AI-integrated systems. I bring
+                  hands-on experience managing endpoint infrastructure, Okta/Azure AD environments,
+                  and security operations — combined with the ability to build the automation tools
+                  that make those systems actually run well.
                 </p>
                 <p className="text-[var(--muted)] leading-relaxed mb-4">
-                  Today I&apos;m focused on bridging the gap between emerging AI capabilities and real-world implementation.
-                  The goal is to use software and automation as proof of practical problem-solving while positioning myself for
-                  stronger work in cybersecurity, IAM, and IT. FCDevelopments is where that mix shows up: career tools,
-                  workflow products, and hands-on systems-minded software with real-world applicability.
+                  My focus right now is the intersection of traditional IT ops and AI integration:
+                  building tooling that automates repetitive security workflows, improves operational
+                  visibility, and closes the gap between what enterprise IT systems can do and what
+                  they actually do in practice.
                 </p>
                 <p className="text-[var(--muted)] leading-relaxed">
-                  I believe the best technology disappears into the workflow. It should feel effortless, respect your
-                  privacy, and actually ship — not sit in a backlog.
+                  FCDevelopments is where that work shows up publicly — practical tools, real implementations,
+                  and a track record of shipping things that work.
                 </p>
               </Reveal>
             </div>
@@ -92,7 +94,7 @@ export function AboutClient() {
                 </div>
                 <div className="text-center p-6 card-chrome">
                   <p className="stat-number text-3xl"><CountUp target={6} suffix="+" /></p>
-                  <p className="stat-label">Projects</p>
+                  <p className="stat-label">Projects Built</p>
                 </div>
                 <div className="text-center p-6 card-chrome">
                   <p className="stat-number text-3xl text-gradient-gold">1</p>
@@ -204,15 +206,16 @@ export function AboutClient() {
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
             {interests.map((item, i) => (
               <Reveal key={item.label} variant="fade-up" delay={i * 0.08}>
-                <div className="card-chrome text-center p-4 group hover:border-[var(--brand)]/30 transition-all duration-300">
+                <div className={`card-chrome text-center p-4 group hover:border-[var(--brand)]/30 transition-all duration-300 ${item.className ?? ""}`}>
                   <Image
                     src={item.icon}
                     alt={item.label}
                     width={36}
                     height={36}
-                    className="mx-auto mb-2 opacity-60 group-hover:opacity-90 transition-opacity duration-300"
+                    className="mx-auto mb-4 opacity-60 group-hover:opacity-90 transition-opacity duration-300"
                   />
-                  <h3 className="text-xs font-semibold text-[var(--muted-strong)]">{item.label}</h3>
+                  <h3 className="text-xl font-semibold text-[var(--foreground)] mb-3">{item.label}</h3>
+                  <p className="text-[var(--muted)] text-sm leading-relaxed">{item.description}</p>
                 </div>
               </Reveal>
             ))}

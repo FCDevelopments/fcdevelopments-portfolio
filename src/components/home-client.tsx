@@ -51,18 +51,21 @@ export function HomeClient({ projects, skills }: { projects: Project[]; skills: 
 
             <Reveal variant="fade-up" delay={0.2}>
               <h1 className="text-5xl sm:text-6xl lg:text-8xl font-extrabold tracking-tight leading-[0.95] mb-6">
-                <span className="text-[var(--foreground)]">Build practical </span>
-                <span className="text-gradient-gold">software</span>
+                <span className="text-[var(--foreground)]">IT Operations</span>
                 <br />
-                <span className="text-[var(--foreground)]">that solves real problems.</span>
+                <span className="text-[var(--foreground)]">&amp; </span>
+                <span className="text-gradient-gold">Security</span>
+                <span className="text-[var(--foreground)]"> — built</span>
+                <br />
+                <span className="text-[var(--foreground)]">for the AI era.</span>
               </h1>
             </Reveal>
 
             <Reveal variant="fade-up" delay={0.4}>
               <p className="text-lg lg:text-xl text-[var(--muted)] max-w-3xl mb-10 leading-relaxed">
-                Portfolio, products, and workflow tools by Fabian Castaneda — IT systems professional and
-                builder focused on automation, operations tooling, and practical software that solves
-                real business problems.
+                Fabian Castaneda — operations-ready IT professional specializing in cybersecurity,
+                identity & access management, and AI-integrated tooling. I build the automation and
+                systems that make modern IT ops faster, more secure, and actually scalable.
               </p>
             </Reveal>
 
@@ -276,26 +279,26 @@ export function HomeClient({ projects, skills }: { projects: Project[]; skills: 
             </Reveal>
 
             <Reveal variant="fade-left" delay={0.2}>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="card-chrome p-6">
-                  <p className="text-[var(--brand)] text-sm font-semibold uppercase tracking-wider mb-2">Current</p>
-                  <h3 className="text-lg font-bold mb-1">AI &amp; Dev</h3>
-                  <p className="text-sm text-[var(--muted)]">OpenClaw, OpenAI Codex, IAM-oriented automation</p>
+              <div className="grid grid-cols-2 gap-4 items-stretch">
+                <div className="card-chrome h-full p-6">
+                  <p className="text-[var(--brand)] text-sm font-semibold uppercase tracking-wider mb-2">Cybersecurity</p>
+                  <h3 className="text-lg font-bold mb-1">Security Ops</h3>
+                  <p className="text-sm text-[var(--muted)]">IAM, endpoint hardening, monitoring, compliance tooling</p>
                 </div>
-                <div className="card-chrome p-6">
-                  <p className="text-[var(--brand)] text-sm font-semibold uppercase tracking-wider mb-2">Products</p>
-                  <h3 className="text-lg font-bold mb-1">Web Apps</h3>
-                  <p className="text-sm text-[var(--muted)]">Next.js, React, Tailwind</p>
+                <div className="card-chrome h-full p-6">
+                  <p className="text-[var(--brand)] text-sm font-semibold uppercase tracking-wider mb-2">AI Integration</p>
+                  <h3 className="text-lg font-bold mb-1">AI Tooling</h3>
+                  <p className="text-sm text-[var(--muted)]">Claude AI, OpenAI Codex, MCP servers, workflow automation</p>
                 </div>
-                <div className="card-chrome p-6">
+                <div className="card-chrome h-full p-6">
                   <p className="text-[var(--brand)] text-sm font-semibold uppercase tracking-wider mb-2">Background</p>
-                  <h3 className="text-lg font-bold mb-1">IT Ops</h3>
-                  <p className="text-sm text-[var(--muted)]">Okta, Azure AD, IAM, Systems</p>
+                  <h3 className="text-lg font-bold mb-1">IT Operations</h3>
+                  <p className="text-sm text-[var(--muted)]">Okta, Azure AD, MDM, endpoint lifecycle, Zendesk</p>
                 </div>
-                <div className="card-chrome p-6">
+                <div className="card-chrome h-full p-6">
                   <p className="text-[var(--brand)] text-sm font-semibold uppercase tracking-wider mb-2">Award</p>
                   <h3 className="text-lg font-bold mb-1">SkillsUSA</h3>
-                  <p className="text-sm text-[var(--muted)]">CA Regional Gold Medal</p>
+                  <p className="text-sm text-[var(--muted)]">CA Regional Gold Medal — Web Design &amp; Dev</p>
                 </div>
               </div>
             </Reveal>

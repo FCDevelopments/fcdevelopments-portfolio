@@ -93,6 +93,7 @@ const SECTION_HEADINGS = [
   "professional experience", "work experience", "experience",
   "projects",
   "leadership",
+  "education & certifications", "education and certifications",
   "education",
   "certifications", "certificates",
 ] as const;
@@ -133,40 +134,64 @@ function splitSections(raw: string): Map<string, string> {
 }
 
 /** Pull bullet-point lines from a block (lines starting with - or •).
- *  Handles PDF line-wrapping by joining continuation lines first. */
+ *  Handles PDF line-wrapping by joining continuation lines first.
+ *
+ *  A "continuation" line is one that logically belongs to the previous bullet
+ *  rather than starting a new one.  We detect this conservatively:
+ *    1. The previous bullet-stripped line starts with a bullet marker and
+ *       the current line does NOT — it is more content of that bullet.
+ *    2. The current line starts with a lowercase letter (mid-sentence wrap).
+ *    3. The previous line does not end sentence-terminally (.!?:), suggesting
+ *       the sentence wasn't finished.
+ *
+ *  We do NOT join if the current line looks like a new bullet (starts with -•)
+ *  or if the previous line ended cleanly.
+ */
 function parseBullets(block: string): string[] {
-  const raw = block
-    .split("\n")
-    .map((l) => l.replace(/^\s*[-•●]\s*/, "").trim())
-    .filter(Boolean);
+  const rawLines = block.split("\n");
 
-  /* First pass: join continuation lines.
-     A line is a continuation if:
-     - it starts with a lowercase letter, OR
-     - the previous line ends without sentence-ending punctuation (.!?)
-       (i.e. the previous line was mid-sentence when PDF wrapped) */
-  const joined = raw.reduce<string[]>((acc, line) => {
-    if (!acc.length) { acc.push(line); return acc; }
-    const prev = acc[acc.length - 1];
-    const prevEndsClean = /[.!?)\d%]$/.test(prev.trim());
-    const isLowerStart = /^[a-z]/.test(line);
-    if (isLowerStart || (!prevEndsClean && !line.startsWith("http"))) {
-      acc[acc.length - 1] += " " + line;
-    } else {
-      acc.push(line);
+  /* Classify each line: is it a bullet marker line or continuation content? */
+  interface LineInfo { isBullet: boolean; text: string; }
+  const classified: LineInfo[] = rawLines.map((l) => {
+    const trimmed = l.trim();
+    const isBullet = /^[-•●◦▸▹▶►]/.test(trimmed);
+    const text = trimmed.replace(/^[-•●◦▸▹▶►]\s*/, "").trim();
+    return { isBullet, text };
+  }).filter((li) => li.text.length > 0);
+
+  /* Merge continuation lines into their parent bullet */
+  const merged: string[] = [];
+  for (const li of classified) {
+    if (!merged.length) {
+      merged.push(li.text);
+      continue;
     }
-    return acc;
-  }, []);
+    const prev = merged[merged.length - 1];
+    const prevEndsClean = /[.!?)]$/.test(prev);
+    const currIsLower = /^[a-z]/.test(li.text);
 
-  /* Second pass: keep only substantive bullets */
-  return joined.filter((l) => l.length > 10).slice(0, 8);
+    if (!li.isBullet && (currIsLower || !prevEndsClean)) {
+      /* Continuation of previous bullet */
+      merged[merged.length - 1] += " " + li.text;
+    } else {
+      merged.push(li.text);
+    }
+  }
+
+  /* Keep only substantive bullets, cap at 8 per entry */
+  return merged.filter((l) => l.length > 10).slice(0, 8);
 }
 
 /**
  * Parse experience entries inside the "experience" section.
  * Expects patterns like:
- *   Company — City, ST
- *   Title | Mon YYYY - Mon YYYY
+ *   Company — City, ST          (company line with em-dash location)
+ *   Title | Mon YYYY – Mon YYYY (title + date line)
+ *   - bullet …
+ *
+ * Also handles:
+ *   Company Name                (plain company name)
+ *   Job Title    Mon YYYY – Present
  *   - bullet …
  */
 function parseExperienceEntries(block: string): ExperienceEntry[] {
@@ -175,22 +200,63 @@ function parseExperienceEntries(block: string): ExperienceEntry[] {
 
   const lines = block.split("\n").map((l) => l.trim()).filter(Boolean);
 
-  /* Detect "entry start" lines: either has " — " (company pattern) or
-     is immediately followed by a date-containing line. */
+  /**
+   * Detect "entry start" lines.  A line is a new entry header when:
+   *  (a) It contains a company–location separator (em-dash with content on both sides)
+   *      AND does not itself contain a date range, OR
+   *  (b) The NEXT non-bullet line contains a date range (title-line pattern), OR
+   *  (c) The CURRENT line contains a date range preceded by a title fragment
+   *      (single-line "Title | Dates" pattern).
+   *
+   * We deliberately do NOT auto-include i===0 to avoid treating the first
+   * bullet as an entry header when the section starts with a bullet list.
+   */
   const entryStarts: number[] = [];
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
-    if (line.startsWith("-") || line.startsWith("•")) continue;
+    if (line.startsWith("-") || line.startsWith("•") || line.startsWith("●")) continue;
+
     const nextLine = lines[i + 1] || "";
     const hasCompanySep = /\s[—–]\s/.test(line) && !dateRe.test(line);
-    const nextHasDate = dateRe.test(nextLine) || /\|/.test(nextLine);
-    if (hasCompanySep || (i === 0 && !line.startsWith("-"))) {
+    const nextHasDate = dateRe.test(nextLine);
+
+    /* Pattern (a): "Company — Location" */
+    if (hasCompanySep) {
       entryStarts.push(i);
-    } else if (nextHasDate && !line.startsWith("-") && !line.startsWith("•")) {
-      entryStarts.push(i);
+      continue;
+    }
+    /* Pattern (b): current line is plain company name, next is title+date */
+    if (nextHasDate && !line.startsWith("-") && !line.startsWith("•")) {
+      /* Make sure this isn't already a date line itself */
+      if (!dateRe.test(line)) {
+        entryStarts.push(i);
+        continue;
+      }
+    }
+    /* Pattern (c): single-line "Title | Mon YYYY – Present" (inline date) */
+    if (dateRe.test(line) && /[|]/.test(line)) {
+      /* Only mark as entry start if it's not immediately after another entry start */
+      const lastStart = entryStarts[entryStarts.length - 1];
+      if (lastStart === undefined || i - lastStart > 1) {
+        entryStarts.push(i);
+      }
     }
   }
 
+  /* If no entry starts found, bail */
+
+  /* Fallback: if no structural headings were detected, treat each non-bullet
+     cluster as a potential entry start (prevents returning empty on unusual formats) */
+  if (!entryStarts.length) {
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      if (!line.startsWith("-") && !line.startsWith("•") && line.length > 5) {
+        entryStarts.push(i);
+        /* Skip until next bullet cluster */
+        while (i + 1 < lines.length && !lines[i + 1].startsWith("-") && !lines[i + 1].startsWith("•")) i++;
+      }
+    }
+  }
   if (!entryStarts.length) return [];
 
   const entries: ExperienceEntry[] = [];
@@ -385,26 +451,51 @@ function parseResumeText(raw: string, current: ResumeData): ResumeData {
   const summary = summaryBlock.replace(/\n/g, " ").replace(/\s+/g, " ").trim() || current.summary;
 
   /* ── Skills ── */
-  const skillsBlock = (
+  const skillsRawBlock =
     sections.get("technical skills") ||
     sections.get("core skills") ||
     sections.get("skills") ||
-    ""
-  ).replace(/\n/g, " ").replace(/\s+/g, " ");
-  const langMatch = skillsBlock.match(/(?:programming\s+languages?|languages?)\s*:\s*([^\n]+)/i);
-  const toolMatch = skillsBlock.match(/(?:platforms?|tools?|systems?|software|technologies)[\s,&and]*(?:tools?|systems?|software|platforms?)?\s*:\s*([^\n]+)/i);
-  const languages = langMatch
-    ? langMatch[1].split(/,\s*/).map((s) => s.trim()).filter(Boolean)
-    : current.skills.languages;
-  const tools = toolMatch
-    ? toolMatch[1].split(/,\s*/).map((s) => s.trim()).filter(Boolean)
-    : current.skills.tools;
+    "";
 
-  /* If skills section is just pipe-separated keywords (CORE SKILLS style), split them */
-  const strengths = (() => {
-    if (langMatch || toolMatch) return current.skills.strengths;
-    if (!skillsBlock) return current.skills.strengths;
-    const items = skillsBlock.split(/[|,\n]/).map((s) => s.trim()).filter((s) => s.length > 1 && s.length < 60);
+  /* Work line-by-line for skills so we can handle multi-line labeled sections */
+  const skillsLines = skillsRawBlock.split("\n").map((l) => l.trim()).filter(Boolean);
+
+  /* Detect labeled sub-sections: "Languages: ..." / "Tools: ..." / "Strengths: ..." etc. */
+  let parsedLanguages: string[] | null = null;
+  let parsedTools: string[] | null = null;
+  let parsedStrengths: string[] | null = null;
+
+  for (const line of skillsLines) {
+    const langLabelMatch = line.match(/^(?:programming\s+)?languages?\s*:\s*(.+)/i);
+    const toolLabelMatch = line.match(/^(?:platforms?|tools?|systems?|software|technologies)(?:[\s,&]+(?:tools?|systems?|software|platforms?))?\s*:\s*(.+)/i);
+    const strengthLabelMatch = line.match(/^(?:core\s+)?strengths?\s*:\s*(.+)/i);
+    const softLabelMatch = line.match(/^(?:soft\s+skills?|other\s+skills?)\s*:\s*(.+)/i);
+
+    if (langLabelMatch) {
+      parsedLanguages = langLabelMatch[1].split(/[,|]/).map((s) => s.trim()).filter(Boolean);
+    } else if (toolLabelMatch) {
+      parsedTools = toolLabelMatch[1].split(/[,|]/).map((s) => s.trim()).filter(Boolean);
+    } else if (strengthLabelMatch || softLabelMatch) {
+      const raw = (strengthLabelMatch?.[1] ?? softLabelMatch?.[1]) || "";
+      parsedStrengths = raw.split(/[,|]/).map((s) => s.trim()).filter(Boolean);
+    }
+  }
+
+  const languages = parsedLanguages ?? current.skills.languages;
+  const tools = parsedTools ?? current.skills.tools;
+
+  /* If no labeled sub-sections, treat the whole block as pipe/comma-separated strengths
+     (common for "CORE SKILLS" style blocks) */
+  const strengths: string[] = (() => {
+    if (parsedStrengths) return parsedStrengths;
+    if (parsedLanguages || parsedTools) return current.skills.strengths;
+    if (!skillsRawBlock.trim()) return current.skills.strengths;
+    /* Strip any remaining label prefixes before splitting */
+    const stripped = skillsRawBlock.replace(/^[A-Za-z\s&]+:\s*/gm, "");
+    const items = stripped
+      .split(/[|,\n]/)
+      .map((s) => s.trim())
+      .filter((s) => s.length > 1 && s.length < 60 && !/^\d+$/.test(s));
     return items.length ? items : current.skills.strengths;
   })();
 
@@ -430,29 +521,113 @@ function parseResumeText(raw: string, current: ResumeData): ResumeData {
   const projects = projBlock ? parseProjectEntries(projBlock) : current.projects;
 
   /* ── Education ── */
-  const eduBlock = sections.get("education") || "";
+  const eduBlock =
+    sections.get("education") ||
+    sections.get("education & certifications") ||
+    sections.get("education and certifications") ||
+    "";
+
+  /* Separate certifications that may be embedded in an "Education & Certifications" section */
+  let parsedCertifications: CertificationEntry[] = current.certifications;
+
   const education: EducationEntry[] = (() => {
     if (!eduBlock) return current.education;
     const eduLines = eduBlock.split("\n").map((l) => l.trim()).filter(Boolean);
+
+    /* Detect certifications sub-block: lines after "Certifications:" or "Certifications" heading */
+    const certStartIdx = eduLines.findIndex((l) => /^certifications?:?$/i.test(l));
+    let certLines: string[] = [];
+    let educationLines = eduLines;
+
+    if (certStartIdx >= 0) {
+      certLines = eduLines.slice(certStartIdx + 1);
+      educationLines = eduLines.slice(0, certStartIdx);
+
+      /* Parse certifications from sub-block */
+      const certEntries: CertificationEntry[] = certLines
+        .filter((l) => l.length > 3 && !l.startsWith("-") === false || l.replace(/^[-•]\s*/, "").length > 3)
+        .map((l) => {
+          const text = l.replace(/^[-•●]\s*/, "").trim();
+          if (!text) return null;
+          /* Try to extract year: "Cert Name (2023)" or "Cert Name – 2023" */
+          const yearMatch = text.match(/[\(—–]\s*(\d{4})\s*\)?$/);
+          const year = yearMatch?.[1] || "";
+          const name = text.replace(/[\s(—–]+\d{4}\s*\)?$/, "").trim();
+          /* Try to extract issuer: "Name — Issuer" or "Name, Issuer" */
+          const issuerMatch = name.match(/^(.+?)\s*[—–,]\s*(.+)$/);
+          return {
+            id: `cert-parsed-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+            name: issuerMatch ? issuerMatch[1].trim() : name,
+            issuer: issuerMatch ? issuerMatch[2].trim() : "",
+            year,
+          } as CertificationEntry;
+        })
+        .filter((c): c is CertificationEntry => c !== null && c.name.length > 2);
+
+      if (certEntries.length) parsedCertifications = certEntries;
+    }
+
+    /* Also check dedicated certifications block from sections */
+    const certBlock = sections.get("certifications") || sections.get("certificates") || "";
+    if (certBlock) {
+      const certEntries: CertificationEntry[] = certBlock
+        .split("\n")
+        .map((l) => l.trim().replace(/^[-•●]\s*/, ""))
+        .filter((l) => l.length > 3)
+        .map((text) => {
+          const yearMatch = text.match(/[\(—–]\s*(\d{4})\s*\)?$/);
+          const year = yearMatch?.[1] || "";
+          const name = text.replace(/[\s(—–]+\d{4}\s*\)?$/, "").trim();
+          const issuerMatch = name.match(/^(.+?)\s*[—–,]\s*(.+)$/);
+          return {
+            id: `cert-parsed-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+            name: issuerMatch ? issuerMatch[1].trim() : name,
+            issuer: issuerMatch ? issuerMatch[2].trim() : "",
+            year,
+          };
+        })
+        .filter((c) => c.name.length > 2);
+      if (certEntries.length) parsedCertifications = certEntries;
+    }
+
+    if (!educationLines.length) return current.education;
+
     /* Try to find school, degree, dates on first few lines */
-    const schoolLine = eduLines.find((l) => /college|university|school|institute|academy/i.test(l)) || eduLines[0] || "";
-    const dateM = eduBlock.match(/(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}\s*[-–—]\s*(?:Present|Current|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4})/i);
+    const schoolLine = educationLines.find((l) => /college|university|school|institute|academy/i.test(l)) || educationLines[0] || "";
+    const dateReParsed = /(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}\s*[-–—]\s*(?:Present|Current|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4})/i;
+    const yearOnlyRe = /(?:19|20)\d{2}\s*[-–—]\s*(?:(?:19|20)\d{2}|Present|Current)/i;
+    const dateM = (eduBlock.match(dateReParsed) || eduBlock.match(yearOnlyRe))?.[0];
+
     const degreeParts = schoolLine.split(/\s*[|—–-]\s*/);
     const school = degreeParts[0]?.trim() || "";
-    const degreeFromSplit = degreeParts.find((p) => /associate|bachelor|master|gpa|degree|science|arts/i.test(p))?.trim() || "";
-    const degreeLine = eduLines.find((l) => l !== schoolLine && /associate|bachelor|master|gpa|degree|science|arts/i.test(l));
+    const degreeFromSplit = degreeParts.find((p) => /associate|bachelor|master|gpa|degree|science|arts|a\.?a\.?|b\.?s\.?|b\.?a\.?/i.test(p))?.trim() || "";
+    const degreeLine = educationLines.find((l) => l !== schoolLine && /associate|bachelor|master|gpa|degree|science|arts|a\.?a\.?|b\.?s\.?|b\.?a\.?/i.test(l));
     const degree = degreeFromSplit || degreeLine || degreeParts[1]?.trim() || "";
 
-    const courseworkLine = eduLines.find((l) => /coursework/i.test(l));
-    const details: string[] = [courseworkLine, ...eduLines.filter((l) => l !== schoolLine && l !== degreeLine && l !== courseworkLine && !dateM?.input?.includes(l))].filter((x): x is string => Boolean(x)).slice(0, 4);
+    const courseworkLine = educationLines.find((l) => /coursework/i.test(l));
+    const usedLines = new Set([schoolLine, degreeLine, courseworkLine].filter(Boolean));
+    const datePrefixTrim = dateM ? (dateM.split(/[-–—]/)[0] ?? "").trim() : "";
+    const extraLines = educationLines.filter((l) => !usedLines.has(l) && !(datePrefixTrim && l.includes(datePrefixTrim)));
+    const detailCandidates: (string | undefined)[] = [courseworkLine, ...extraLines];
+    const details: string[] = detailCandidates
+      .filter((x): x is string => typeof x === "string" && x.length > 3)
+      .slice(0, 4);
+
+    let startDate = "";
+    let endDate = "";
+    if (dateM) {
+      const parts = dateM.split(/\s*[-–—]\s*/);
+      startDate = parts[0]?.trim() || "";
+      endDate = parts[1]?.trim() || "";
+    }
 
     return [{
       id: `pe-edu-${Date.now()}`,
       school,
       degree,
       location: "",
-      startDate: dateM ? dateM[0].split(/\s*[-–—]\s*/)[0]?.trim() || "" : "",
-      endDate: dateM ? dateM[0].split(/\s*[-–—]\s*/)[1]?.trim() || "" : "",
+      startDate,
+      endDate,
       details: details.length ? details : [""],
     }];
   })();
@@ -464,7 +639,7 @@ function parseResumeText(raw: string, current: ResumeData): ResumeData {
     experience: experience.length ? experience : current.experience,
     projects: projects.length ? projects : current.projects,
     education: education.length ? education : current.education,
-    certifications: current.certifications,
+    certifications: parsedCertifications,
     sectionOrder: current.sectionOrder,
   };
 }
@@ -668,16 +843,40 @@ export function ResumeBuilderShell() {
         for (let i = 1; i <= pdf.numPages; i++) {
           const page = await pdf.getPage(i);
           const content = await page.getTextContent();
-          /* Reconstruct line breaks from Y-coordinate gaps */
+          /**
+           * Reconstruct line breaks from Y-coordinate gaps.
+           *
+           * Key insight: PDF text items within the SAME visual line can have
+           * slightly different Y values due to sub-pixel rendering, baseline
+           * shifts for superscripts, etc.  We only insert a newline when the
+           * Y delta is large enough to indicate a *real* new line.  A
+           * threshold of ~5–6 PDF units (~2 pt) is safe for most resumes;
+           * we also skip emitting a newline when the previous token ended
+           * with a word character (it's a same-word split across two spans).
+           */
           const items = content.items as { str?: string; transform?: number[] }[];
           let lastY: number | null = null;
           const parts: string[] = [];
           for (const item of items) {
+            const str = item.str || "";
             const y = item.transform?.[5] ?? null;
-            if (lastY !== null && y !== null && Math.abs(lastY - y) > 2) {
-              parts.push("\n");
+
+            if (lastY !== null && y !== null) {
+              const delta = Math.abs(lastY - y);
+              if (delta > 5) {
+                /* Real new line — but avoid double-newlines */
+                if (parts.length && parts[parts.length - 1] !== "\n") {
+                  parts.push("\n");
+                }
+              } else if (delta > 0.5) {
+                /* Sub-pixel shift on same line — may be a word boundary */
+                const prev = parts[parts.length - 1] || "";
+                if (prev && !prev.endsWith(" ") && str && !str.startsWith(" ")) {
+                  parts.push(" ");
+                }
+              }
             }
-            parts.push(item.str || "");
+            parts.push(str);
             if (y !== null) lastY = y;
           }
           pages.push(parts.join(""));

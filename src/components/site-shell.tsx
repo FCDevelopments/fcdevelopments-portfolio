@@ -35,7 +35,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
                 <span style={{ color: "var(--brand)" }}>FC</span><span className="text-[var(--foreground)]">.</span>
               </p>
               <p className="text-sm text-[var(--muted)] leading-relaxed max-w-xs">
-                Building practical software, workflow tools, and AI-assisted products with real business value. Cerritos, CA.
+                IT Operations &amp; Cybersecurity professional. Building AI-integrated tools and automation for modern enterprise systems. Cerritos, CA.
               </p>
             </div>
             <div>

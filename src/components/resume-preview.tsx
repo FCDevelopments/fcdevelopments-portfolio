@@ -39,7 +39,12 @@ export function ResumePreview({
       </header>
 
       {/* ── SUMMARY ── */}
-      {data.summary && data.summary !== "Write a short, role-focused summary that highlights your strongest experience, tools, and the kind of work you want next." && (
+      {data.summary &&
+        /* Hide generic/empty placeholder summaries — check for common placeholder markers */
+        !/^\s*$/.test(data.summary) &&
+        !/results-driven \[your field\]/i.test(data.summary) &&
+        !/write a short, role-focused summary/i.test(data.summary) &&
+        (
         <section className="resume-section">
           <h2>Professional Summary</h2>
           <p className="resume-summary-text">{data.summary}</p>
@@ -65,30 +70,45 @@ export function ResumePreview({
       )}
 
       {/* ── EXPERIENCE ── */}
-      <section className="resume-section">
-        <h2>Professional Experience</h2>
-        {data.experience.map((entry) => (
-          <article key={entry.id} className="resume-entry">
-            <div className="resume-entry-head">
-              <div>
-                <h3>{entry.title}{entry.company ? <>{" — "}<span className="resume-company-name">{entry.company}</span></> : null}{entry.location ? <>{", "}<span className="resume-location">{entry.location}</span></> : null}</h3>
-              </div>
-              {(entry.startDate || entry.endDate) && (
-                <p className="resume-entry-dates">
-                  {[entry.startDate, entry.endDate].filter(Boolean).join(" – ")}
-                </p>
-              )}
-            </div>
-            {entry.bullets.filter(b => b.trim()).length > 0 && (
-              <ul className="resume-bullets">
-                {entry.bullets.filter(b => b.trim()).map((bullet, index) => (
-                  <li key={`${entry.id}-${index}`}>{bullet}</li>
-                ))}
-              </ul>
-            )}
-          </article>
-        ))}
-      </section>
+      {data.experience.filter(e => e.title.trim() || e.company.trim()).length > 0 && (
+        <section className="resume-section">
+          <h2>Professional Experience</h2>
+          {data.experience.filter(e => e.title.trim() || e.company.trim()).map((entry) => {
+            /* Build the heading line: "Title — Company, Location" */
+            const titlePart = entry.title.trim();
+            const companyPart = entry.company.trim();
+            const locationPart = entry.location.trim();
+            const companyLocation = [companyPart, locationPart].filter(Boolean).join(", ");
+
+            return (
+              <article key={entry.id} className="resume-entry">
+                <div className="resume-entry-head">
+                  <div>
+                    <h3>
+                      {titlePart && <span className="resume-job-title">{titlePart}</span>}
+                      {titlePart && companyLocation && <span className="resume-entry-sep"> — </span>}
+                      {companyLocation && <span className="resume-company-name">{companyLocation}</span>}
+                      {!titlePart && companyPart && <span className="resume-company-name">{companyLocation}</span>}
+                    </h3>
+                  </div>
+                  {(entry.startDate || entry.endDate) && (
+                    <p className="resume-entry-dates">
+                      {[entry.startDate, entry.endDate].filter(Boolean).join(" – ")}
+                    </p>
+                  )}
+                </div>
+                {entry.bullets.filter(b => b.trim()).length > 0 && (
+                  <ul className="resume-bullets">
+                    {entry.bullets.filter(b => b.trim()).map((bullet, index) => (
+                      <li key={`${entry.id}-b${index}`}>{bullet}</li>
+                    ))}
+                  </ul>
+                )}
+              </article>
+            );
+          })}
+        </section>
+      )}
 
       {/* ── PROJECTS ── */}
       {hasProjects && (
@@ -115,30 +135,36 @@ export function ResumePreview({
       )}
 
       {/* ── EDUCATION ── */}
-      <section className="resume-section">
-        <h2>Education</h2>
-        {data.education.map((entry) => (
-          <article key={entry.id} className="resume-entry">
-            <div className="resume-entry-head">
-              <div>
-                <h3>{entry.school}{entry.degree ? <>{" — "}<span className="resume-company-name">{entry.degree}</span></> : null}</h3>
+      {data.education.filter(e => e.school.trim() || e.degree.trim()).length > 0 && (
+        <section className="resume-section">
+          <h2>Education</h2>
+          {data.education.filter(e => e.school.trim() || e.degree.trim()).map((entry) => (
+            <article key={entry.id} className="resume-entry">
+              <div className="resume-entry-head">
+                <div>
+                  <h3>
+                    {entry.school.trim() && <span>{entry.school.trim()}</span>}
+                    {entry.school.trim() && entry.degree.trim() && <span className="resume-entry-sep"> — </span>}
+                    {entry.degree.trim() && <span className="resume-company-name">{entry.degree.trim()}</span>}
+                  </h3>
+                </div>
+                {(entry.startDate || entry.endDate) && (
+                  <p className="resume-entry-dates">
+                    {[entry.startDate, entry.endDate].filter(Boolean).join(" – ")}
+                  </p>
+                )}
               </div>
-              {(entry.startDate || entry.endDate) && (
-                <p className="resume-entry-dates">
-                  {[entry.startDate, entry.endDate].filter(Boolean).join(" – ")}
-                </p>
+              {entry.details.filter(d => d.trim()).length > 0 && (
+                <ul className="resume-bullets">
+                  {entry.details.filter(d => d.trim()).map((detail, index) => (
+                    <li key={`${entry.id}-detail-${index}`}>{detail}</li>
+                  ))}
+                </ul>
               )}
-            </div>
-            {entry.details.filter(d => d.trim()).length > 0 && (
-              <ul className="resume-bullets">
-                {entry.details.filter(d => d.trim()).map((detail, index) => (
-                  <li key={`${entry.id}-detail-${index}`}>{detail}</li>
-                ))}
-              </ul>
-            )}
-          </article>
-        ))}
-      </section>
+            </article>
+          ))}
+        </section>
+      )}
 
       {/* ── CERTIFICATIONS ── */}
       {hasCerts && (
