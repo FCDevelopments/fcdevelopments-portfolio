@@ -74,7 +74,7 @@ export function AboutClient() {
             <div>
               <Reveal variant="fade-right">
                 <p className="eyebrow mb-4">About</p>
-                <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[0.95] mb-6">
+                <h1 className="display display-xl mb-6">
                   Fabian<br />
                   <span className="text-gradient-accent">Castaneda.</span>
                 </h1>

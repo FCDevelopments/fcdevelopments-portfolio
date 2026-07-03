@@ -31,18 +31,18 @@ export function ProjectsClient({ projects }: { projects: Project[] }) {
         <div className="orb orb-accent w-[400px] h-[400px] top-[-10%] right-[10%]" />
         <div className="mx-auto max-w-7xl px-6 lg:px-10 relative z-10">
           <Reveal variant="fade-up">
-            <p className="eyebrow mb-4">ls ~/projects</p>
+            <div className="section-label mb-6"><span className="label-index">ls</span><span>~/projects --all</span></div>
           </Reveal>
           <Reveal variant="fade-up" delay={0.1}>
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[0.95] mb-6">
+            <h1 className="display display-xl mb-6">
               The <span className="text-gradient-accent">Work.</span>
             </h1>
           </Reveal>
           <Reveal variant="fade-up" delay={0.2}>
             <p className="text-lg text-[var(--muted)] max-w-2xl leading-relaxed">
-              Production automations that ran real workloads — published as genericized,
-              ready-to-fork templates — plus tooling and product experiments. Synced live
-              from GitHub.
+              Production automations that ran real workloads — scrubbed of company data
+              and published as ready-to-fork templates — plus tooling and product
+              experiments. Synced live from GitHub.
             </p>
           </Reveal>
         </div>

@@ -44,7 +44,7 @@ const REPO_OVERRIDES: Record<
   string,
   Partial<Project> & { hidden?: boolean }
 > = {
-  // ── Production automation templates (ran in production; genericized for reuse) ──
+  // ── Production automation templates (ran in production; scrubbed for public reuse) ──
   ringCentralArchiver: {
     name: "RingCentral Archiver",
     summary:

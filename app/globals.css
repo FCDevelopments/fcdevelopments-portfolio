@@ -436,3 +436,219 @@ button:focus-visible {
   outline-offset: 3px;
   border-radius: 4px;
 }
+
+/* ═══════ Display type (Anton) — theunknown-style giant headlines ═══════ */
+
+.display {
+  font-family: var(--font-anton), Impact, sans-serif;
+  text-transform: uppercase;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 0.92;
+}
+
+.display-hero { font-size: clamp(3.5rem, 13vw, 11rem); }
+.display-xl   { font-size: clamp(3rem, 9vw, 8rem); }
+.display-lg   { font-size: clamp(2.2rem, 6vw, 5rem); }
+
+.display-outline {
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(230, 235, 244, 0.35);
+}
+
+/* ═══════ Kinetic line reveals (hero) ═══════ */
+
+.kinetic-line {
+  display: block;
+  overflow: hidden;
+}
+
+.kinetic-line > span {
+  display: block;
+  transform: translateY(110%);
+  transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+.kinetic-ready .kinetic-line > span { transform: translateY(0); }
+
+.kinetic-slide-l,
+.kinetic-slide-r {
+  display: inline-block;
+  transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 1.2s ease;
+  will-change: transform;
+}
+
+.kinetic-slide-l { transform: translateX(-12vw); opacity: 0; }
+.kinetic-slide-r { transform: translateX(12vw); opacity: 0; }
+.kinetic-ready .kinetic-slide-l,
+.kinetic-ready .kinetic-slide-r { transform: translateX(0); opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .kinetic-line > span,
+  .kinetic-slide-l,
+  .kinetic-slide-r { transform: none; opacity: 1; transition: none; }
+}
+
+/* ═══════ Section labels — "// 01 What I run" ═══════ */
+
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.section-label .label-index { color: var(--brand); }
+
+.section-label::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: rgba(230, 235, 244, 0.08);
+}
+
+/* ═══════ Pinned capability panels ═══════ */
+
+.pin-section { position: relative; }
+
+.pin-viewport {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.pin-panel {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  opacity: 0;
+  transform: translateY(6vh) scale(0.985);
+  transition: opacity 0.5s ease, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.pin-panel.is-active {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.pin-progress {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.pin-progress span {
+  width: 2.25rem;
+  height: 2px;
+  background: rgba(230, 235, 244, 0.12);
+  transition: background 0.3s ease;
+}
+
+.pin-progress span.is-active { background: var(--brand); }
+
+/* ═══════ Work list — giant type rows ═══════ */
+
+.work-row {
+  display: block;
+  position: relative;
+  padding: 2.2rem 0;
+  border-bottom: 1px solid rgba(230, 235, 244, 0.08);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.work-row:first-of-type { border-top: 1px solid rgba(230, 235, 244, 0.08); }
+
+.work-row .work-title {
+  font-family: var(--font-anton), Impact, sans-serif;
+  text-transform: uppercase;
+  font-size: clamp(1.9rem, 5.5vw, 4.5rem);
+  line-height: 0.95;
+  letter-spacing: 0.01em;
+  color: rgba(230, 235, 244, 0.42);
+  transition: color 0.35s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.work-row:hover .work-title,
+.work-row:focus-visible .work-title {
+  color: var(--foreground);
+  transform: translateX(1.2rem);
+}
+
+.work-row .work-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.7rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: var(--chrome-dim);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.work-row:hover .work-meta,
+.work-row:focus-visible .work-meta { opacity: 1; transform: translateY(0); }
+
+.work-row .work-index {
+  position: absolute;
+  right: 0;
+  top: 2.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--chrome-dim);
+  transition: color 0.35s ease;
+}
+
+.work-row:hover .work-index { color: var(--brand); }
+
+@media (hover: none) {
+  .work-row .work-title { color: var(--foreground); }
+  .work-row .work-meta { opacity: 1; transform: none; }
+}
+
+/* ═══════ Inverted contact finale ═══════ */
+
+.invert-section {
+  background: #eef1f6;
+  color: #0b1220;
+}
+
+.invert-section .display-xl,
+.invert-section .display-hero { color: #0b1220; }
+
+.invert-section .invert-muted { color: #4a5568; }
+
+.invert-section a.invert-link {
+  font-family: var(--font-anton), Impact, sans-serif;
+  text-transform: uppercase;
+  font-size: clamp(2rem, 7vw, 5.5rem);
+  line-height: 1.04;
+  color: #0b1220;
+  text-decoration: none;
+  display: inline-block;
+  transition: color 0.3s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.invert-section a.invert-link:hover {
+  color: var(--brand-dark);
+  transform: translateX(0.8rem);
+}
+
+/* ═══════ Big vertical breathing room (48px+ section gaps) ═══════ */
+
+.mega-section { padding: clamp(6rem, 12vh, 10rem) 0; }
