@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { Reveal, CountUp } from "./motion";
@@ -74,11 +75,13 @@ const principles = [
 ];
 
 const interests = [
-  { label: "Hiking", note: "SoCal trails, early starts" },
-  { label: "Muay Thai", note: "discipline under pressure" },
-  { label: "My Dog", note: "chief morale officer" },
-  { label: "Good People", note: "build memories, not just systems" },
-  { label: "Emerging Tech", note: "tools with real-world impact" },
+  { label: "Hiking", note: "SoCal trails, early starts", photo: "/images/int-hiking.jpg" },
+  { label: "Muay Thai", note: "discipline under pressure", photo: "/images/int-muaythai.jpg" },
+  { label: "Fishing", note: "quiet water, clear head", photo: "/images/int-fishing.jpg" },
+  { label: "Guitar", note: "strings after hours", photo: null },
+  { label: "My Dog", note: "chief morale officer", photo: "/images/int-dog.jpg" },
+  { label: "Good People", note: "build memories, not just systems", photo: "/images/int-friends.jpg" },
+  { label: "Emerging Tech", note: "tools with real-world impact", photo: null },
 ];
 
 /** Word-stagger headline reveal (shared pattern with home). */
@@ -186,11 +189,18 @@ export function AboutClient() {
               </p>
             </div>
 
-            {/*
-              Headshot slot — drop a real photo at public/images/fabian.jpg and
-              swap this block for: <Image src="/images/fabian.jpg" ... />
-            */}
-            <div className="hidden lg:flex flex-col gap-3">
+            <div className="hidden lg:flex flex-col gap-4">
+              <div className="hero-portrait">
+                <Image
+                  src="/images/hero-fabian.jpg"
+                  alt="Fabian Castaneda"
+                  width={548}
+                  height={700}
+                  priority
+                  className="hero-portrait-img"
+                />
+                <span className="hero-portrait-tag mono">fabian.castaneda — operator</span>
+              </div>
               <div className="grid grid-cols-2 gap-3">
                 {[
                   { n: "3", l: "Years in IT" },
@@ -290,6 +300,11 @@ export function AboutClient() {
                 <div className="interest-row group">
                   <span className="interest-title">{item.label}</span>
                   <span className="interest-note">{item.note}</span>
+                  {item.photo && (
+                    <span className="interest-photo" aria-hidden="true">
+                      <Image src={item.photo} alt="" width={230} height={310} className="interest-photo-img" />
+                    </span>
+                  )}
                 </div>
               </Reveal>
             ))}
