@@ -43,8 +43,8 @@ const experience = [
   },
   {
     role: "Desktop Technician",
-    company: "Field Service — Dell & HP",
-    location: "Los Angeles Metro, CA",
+    company: "Cornerstone Marketing Concepts",
+    location: "Cerritos, CA",
     period: "2021 — 2022",
     bullets: [
       "Performed weekly field repairs and replacements on Dell and HP laptops and desktops — motherboards, palm rests, keyboards, LCDs, batteries, power supplies, drives, RAM, and graphics cards.",
