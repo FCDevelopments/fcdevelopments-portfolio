@@ -652,3 +652,65 @@ button:focus-visible {
 /* ═══════ Big vertical breathing room (48px+ section gaps) ═══════ */
 
 .mega-section { padding: clamp(6rem, 12vh, 10rem) 0; }
+
+/* ═══════ Scroll-reactive page background ═══════ */
+
+.scroll-bg {
+  transition: background-color 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ═══════ Word-stagger reveal (animated headlines) ═══════ */
+
+.word-reveal .wr-word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+}
+
+.word-reveal .wr-word > span {
+  display: inline-block;
+  transform: translateY(115%);
+  transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--wr-delay, 0s);
+  will-change: transform;
+}
+
+.word-reveal.is-inview .wr-word > span { transform: translateY(0); }
+
+@media (prefers-reduced-motion: reduce) {
+  .word-reveal .wr-word > span { transform: none; transition: none; }
+}
+
+/* ═══════ Warm gradient (second accent voice) ═══════ */
+
+.text-gradient-warm {
+  background: linear-gradient(100deg, #fbbf24 0%, #fb7185 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* ═══════ Light band (bright contrast section) ═══════ */
+
+.light-band {
+  background: #f2f4f8;
+  color: #0b1220;
+}
+
+.light-band .stat-number { color: #0b1220; }
+.light-band .stat-label { color: #5a6478; }
+.light-band .section-label { color: #5a6478; }
+.light-band .section-label::after { background: rgba(11, 18, 32, 0.12); }
+
+/* ═══════ GlowCard content helpers ═══════ */
+
+.glow-card-body {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
+  padding: 0.5rem;
+}

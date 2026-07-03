@@ -1,8 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { Reveal, CountUp } from "./motion";
+import { WebGLShader } from "./ui/web-gl-shader";
+import { GlowCard } from "./ui/spotlight-card";
+import { LiquidButton } from "./ui/liquid-glass-button";
 
 type Project = {
   name: string;
@@ -15,131 +18,129 @@ type Project = {
 
 const capabilities = [
   {
-    title: "Automation",
-    tagline: "The work nobody should do by hand.",
-    copy: "Production pipelines that replace recurring manual work — scheduled, monitored, and self-alerting. Stale inputs get rejected, bad rows get quarantined, failures page a human.",
-    stack: "Python · Node.js · PowerShell · Task Scheduler",
+    kicker: "automate()",
+    title: "Workflow Automation",
+    copy: "Production pipelines that replace recurring manual work — scheduled, monitored, self-alerting. Stale inputs rejected, bad rows quarantined, failures page a human.",
+    glow: "green" as const,
   },
   {
-    title: "Integration",
-    tagline: "Systems that finally talk to each other.",
-    copy: "Moving data correctly between the platforms a business actually runs on — Jira, Salesforce, Box, RingCentral, Snowflake, Outlook — with rate-limit discipline and dedup by design.",
-    stack: "REST APIs · Webhooks · OAuth/JWT · CSV pipelines",
+    kicker: "connect()",
+    title: "Systems Integration",
+    copy: "Data moved correctly between the platforms a business runs on — Jira, Salesforce, Box, RingCentral, Snowflake, Outlook — with rate-limit discipline and dedup by design.",
+    glow: "blue" as const,
   },
   {
-    title: "AI Tooling",
-    tagline: "Practical AI. Not demos.",
-    copy: "LLM agents integrated with company data, speech-to-text pipelines that transcribe 19 GB videos, and AI reporters in daily company-wide use.",
-    stack: "Claude · MCP Servers · AssemblyAI · Semantic models",
+    kicker: "augment()",
+    title: "AI & LLM Tooling",
+    copy: "LLM agents wired into company data, speech-to-text pipelines that chew through 19 GB videos, AI reporters in daily company-wide use. Practical AI, not demos.",
+    glow: "purple" as const,
   },
   {
-    title: "Operations",
-    tagline: "Keeping production boring.",
-    copy: "Okta administration, identity lifecycle, onboarding QC, and site administration across five platforms. The discipline that makes automation safe to trust.",
-    stack: "Okta · Entra ID · Jira Service Management · MDM",
+    kicker: "operate()",
+    title: "IT Operations",
+    copy: "Okta administration, identity lifecycle, onboarding QC, site admin across five platforms. The discipline that makes automation safe to trust.",
+    glow: "orange" as const,
   },
 ];
 
-/** Scroll-pinned capability panels — theunknown.tv-style section. */
-function PinnedCapabilities() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const [active, setActive] = useState(0);
+/** Splits text into words and reveals them with a stagger when scrolled into view. */
+function WordReveal({ text, className = "", as: Tag = "h2" }: { text: string; className?: string; as?: "h1" | "h2" | "h3" | "p" }) {
+  const ref = useRef<HTMLElement>(null);
+  const [inview, setInview] = useState(false);
 
   useEffect(() => {
-    let raf = 0;
-    const onScroll = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
-        const el = sectionRef.current;
-        if (!el) return;
-        const rect = el.getBoundingClientRect();
-        const scrollable = el.offsetHeight - window.innerHeight;
-        if (scrollable <= 0) return;
-        const progress = Math.min(1, Math.max(0, -rect.top / scrollable));
-        setActive(Math.min(capabilities.length - 1, Math.floor(progress * capabilities.length)));
-      });
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      cancelAnimationFrame(raf);
-    };
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInview(true);
+          io.disconnect();
+        }
+      },
+      { threshold: 0.35 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
   }, []);
 
+  const words = text.split(" ");
   return (
-    <section ref={sectionRef} className="pin-section" style={{ height: `${capabilities.length * 100 + 60}vh` }}>
-      <div className="pin-viewport">
-        <div className="mx-auto w-full max-w-7xl px-6 lg:px-10 relative h-full flex flex-col justify-center">
-          <div className="section-label mb-4 shrink-0">
-            <span className="label-index">01</span>
-            <span>What I Do</span>
-          </div>
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    <Tag ref={ref as any} className={`word-reveal ${inview ? "is-inview" : ""} ${className}`} aria-label={text}>
+      {words.map((w, i) => (
+        <span key={i} className="wr-word" aria-hidden="true">
+          <span style={{ "--wr-delay": `${i * 0.055}s` } as React.CSSProperties}>{w}</span>
+          {i < words.length - 1 ? <span>&nbsp;</span> : null}
+        </span>
+      ))}
+    </Tag>
+  );
+}
 
-          <div className="relative flex-1 max-h-[62vh]">
-            {capabilities.map((cap, i) => (
-              <div key={cap.title} className={`pin-panel ${i === active ? "is-active" : ""}`}>
-                <h2 className="display display-xl mb-5">
-                  <span className={i === active ? "text-gradient-accent" : ""}>{cap.title}</span>
-                </h2>
-                <p className="text-xl lg:text-2xl text-[var(--foreground)] font-medium mb-4 max-w-2xl">
-                  {cap.tagline}
-                </p>
-                <p className="text-[var(--muted)] text-base lg:text-lg leading-relaxed max-w-2xl mb-6">
-                  {cap.copy}
-                </p>
-                <p className="mono text-xs tracking-[0.14em] uppercase text-[var(--chrome-dim)]">{cap.stack}</p>
-              </div>
-            ))}
-          </div>
+/** Section wrapper that reports its background color to the scroll-bg controller. */
+function BgSection({
+  bg,
+  onEnter,
+  className = "",
+  children,
+}: {
+  bg: string;
+  onEnter: (bg: string) => void;
+  className?: string;
+  children: ReactNode;
+}) {
+  const ref = useRef<HTMLElement>(null);
 
-          <div className="pin-progress shrink-0">
-            {capabilities.map((c, i) => (
-              <span key={c.title} className={i === active ? "is-active" : ""} />
-            ))}
-          </div>
-        </div>
-      </div>
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) onEnter(bg);
+      },
+      { threshold: 0.4 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [bg, onEnter]);
+
+  return (
+    <section ref={ref} className={className}>
+      {children}
     </section>
   );
 }
 
+const HERO_BG = "#04060c";
+
 export function HomeClient({ projects, skills }: { projects: Project[]; skills: string[] }) {
-  const cursorRef = useRef<HTMLDivElement>(null);
   const [ready, setReady] = useState(false);
+  const [bg, setBg] = useState(HERO_BG);
 
   useEffect(() => {
     const t = window.setTimeout(() => setReady(true), 120);
-    const handleMouseMove = (e: MouseEvent) => {
-      if (cursorRef.current) {
-        cursorRef.current.style.left = e.clientX + "px";
-        cursorRef.current.style.top = e.clientY + "px";
-      }
-    };
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => {
-      window.clearTimeout(t);
-      window.removeEventListener("mousemove", handleMouseMove);
-    };
+    return () => window.clearTimeout(t);
   }, []);
 
   return (
-    <main className={`bg-[var(--background)] text-[var(--foreground)] grain-overlay relative ${ready ? "kinetic-ready" : ""}`}>
-      <div ref={cursorRef} className="cursor-glow hidden lg:block" />
-
-      {/* ═══════ HERO — full-screen kinetic type ═══════ */}
-      <section className="hero-surface relative min-h-screen flex flex-col justify-center overflow-hidden">
-        <div className="orb orb-accent w-[480px] h-[480px] top-[6%] right-[4%]" />
-        <div className="orb orb-soft w-[340px] h-[340px] bottom-[10%] left-[6%]" style={{ animationDelay: "3s" }} />
+    <main
+      className={`scroll-bg text-[var(--foreground)] grain-overlay relative ${ready ? "kinetic-ready" : ""}`}
+      style={{ backgroundColor: bg }}
+    >
+      {/* ═══════ HERO — WebGL shader + kinetic type ═══════ */}
+      <BgSection bg={HERO_BG} onEnter={setBg} className="relative min-h-screen flex flex-col justify-center overflow-hidden">
+        <WebGLShader className="absolute inset-0 w-full h-full block opacity-70" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#04060c]" />
 
         <div className="mx-auto max-w-7xl px-6 lg:px-10 relative z-10 w-full pt-20">
-          <div className="flex items-center gap-3 mb-8">
-            <span className="relative flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--brand)] opacity-60" />
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[var(--brand)]" />
+          <div className="flex items-center gap-2 mb-8">
+            <span className="relative flex h-3 w-3 items-center justify-center">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--brand)] opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-[var(--brand)]" />
             </span>
-            <p className="mono text-xs tracking-[0.22em] uppercase text-[var(--muted)]">
-              Fabian Castaneda — IT Systems Engineer · Orange County, CA
+            <p className="mono text-xs tracking-[0.22em] uppercase text-[var(--brand)]">
+              Fabian Castaneda — IT Systems Engineer
             </p>
           </div>
 
@@ -155,42 +156,76 @@ export function HomeClient({ projects, skills }: { projects: Project[]; skills: 
             </span>
           </h1>
 
-          <div className="mt-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-8">
-            <p className="text-lg lg:text-xl text-[var(--muted)] max-w-xl leading-relaxed">
+          <div className="mt-10 flex flex-col sm:flex-row sm:items-center gap-8">
+            <p className="text-lg lg:text-xl text-[var(--muted-strong)] max-w-xl leading-relaxed">
               Production automation for IT, finance, and operations — engineered to run
               unattended, fail loudly, and do the job correctly every single time.
             </p>
-            <div className="flex gap-4 shrink-0">
-              <Link href="/projects" className="button-primary">View the Work</Link>
+            <div className="flex items-center gap-4 shrink-0">
+              <Link href="/projects" aria-label="View the work">
+                <LiquidButton className="text-white border border-white/25 rounded-full font-semibold" size="xl">
+                  View the Work
+                </LiquidButton>
+              </Link>
               <a
                 href="https://github.com/FCDevelopments"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="button-secondary"
+                className="nav-link mono text-sm uppercase tracking-widest text-[var(--muted-strong)]"
               >
-                GitHub
+                GitHub →
               </a>
             </div>
           </div>
         </div>
 
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 mono text-[0.65rem] tracking-[0.3em] uppercase text-[var(--chrome-dim)]">
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 mono text-[0.65rem] tracking-[0.3em] uppercase text-[var(--chrome-dim)] z-10">
           Scroll
         </div>
-      </section>
+      </BgSection>
 
-      {/* ═══════ 01 — PINNED CAPABILITIES ═══════ */}
-      <PinnedCapabilities />
-
-      {/* ═══════ 02 — NUMBERS ═══════ */}
-      <section className="mega-section border-y border-white/[0.04]">
+      {/* ═══════ 01 — CAPABILITIES (spotlight cards) ═══════ */}
+      <BgSection bg="#061b12" onEnter={setBg} className="mega-section">
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
           <Reveal variant="fade-up">
-            <div className="section-label mb-14">
-              <span className="label-index">02</span>
+            <div className="section-label mb-6">
+              <span className="label-index">01</span>
+              <span>What I Do</span>
+            </div>
+          </Reveal>
+          <WordReveal
+            text="Design it. Build it. Let it run."
+            className="display display-lg mb-14"
+          />
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+            {capabilities.map((cap, i) => (
+              <Reveal key={cap.title} variant="fade-up" delay={i * 0.08}>
+                <GlowCard glowColor={cap.glow} customSize className="w-full h-full min-h-[300px]">
+                  <div className="glow-card-body">
+                    <p className="mono text-xs text-[var(--brand)] mb-3">{cap.kicker}</p>
+                    <h3 className="text-xl font-bold mb-3 text-white">{cap.title}</h3>
+                    <p className="text-sm text-[var(--muted-strong)] leading-relaxed">{cap.copy}</p>
+                  </div>
+                </GlowCard>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </BgSection>
+
+      {/* ═══════ 02 — RECEIPTS (bright light band) ═══════ */}
+      <section className="light-band mega-section">
+        <div className="mx-auto max-w-7xl px-6 lg:px-10">
+          <Reveal variant="fade-up">
+            <div className="section-label mb-6">
+              <span className="label-index" style={{ color: "#059669" }}>02</span>
               <span>Receipts</span>
             </div>
           </Reveal>
+          <WordReveal
+            text="Numbers, not adjectives."
+            className="display display-lg mb-14"
+          />
           <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
             <Reveal variant="fade-up" delay={0}>
               <div>
@@ -212,7 +247,7 @@ export function HomeClient({ projects, skills }: { projects: Project[]; skills: 
             </Reveal>
             <Reveal variant="fade-up" delay={0.3}>
               <div>
-                <p className="stat-number text-gradient-accent"><CountUp target={30} suffix="+" /></p>
+                <p className="stat-number" style={{ color: "#059669" }}><CountUp target={30} suffix="+" /></p>
                 <p className="stat-label">Hours Saved / Month</p>
               </div>
             </Reveal>
@@ -221,14 +256,18 @@ export function HomeClient({ projects, skills }: { projects: Project[]; skills: 
       </section>
 
       {/* ═══════ 03 — THE WORK (giant type rows) ═══════ */}
-      <section className="mega-section">
+      <BgSection bg="#0a1224" onEnter={setBg} className="mega-section">
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
           <Reveal variant="fade-up">
-            <div className="section-label mb-14">
+            <div className="section-label mb-6">
               <span className="label-index">03</span>
               <span>The Work</span>
             </div>
           </Reveal>
+          <WordReveal
+            text="Built. Shipped. Running."
+            className="display display-lg mb-14"
+          />
 
           <div>
             {projects.map((project, i) => (
@@ -244,7 +283,6 @@ export function HomeClient({ projects, skills }: { projects: Project[]; skills: 
                   <span className="work-meta">
                     <span className="text-[var(--brand)]">{project.badge}</span>
                     <span>{project.tech.slice(0, 3).join(" · ")}</span>
-                    <span className="hidden sm:inline">— {project.description.split("—")[0].split(":")[0].trim()}</span>
                   </span>
                 </a>
               </Reveal>
@@ -259,10 +297,10 @@ export function HomeClient({ projects, skills }: { projects: Project[]; skills: 
             </div>
           </Reveal>
         </div>
-      </section>
+      </BgSection>
 
       {/* ═══════ MARQUEE ═══════ */}
-      <section className="py-10 border-y border-white/[0.04] overflow-hidden">
+      <section className="py-10 border-y border-white/[0.06] overflow-hidden">
         <div className="flex whitespace-nowrap">
           <div className="tech-marquee">
             {[...skills, ...skills].map((skill, i) => (
@@ -277,28 +315,27 @@ export function HomeClient({ projects, skills }: { projects: Project[]; skills: 
         </div>
       </section>
 
-      {/* ═══════ 04 — ABOUT STATEMENT ═══════ */}
-      <section className="mega-section">
+      {/* ═══════ 04 — THE OPERATOR ═══════ */}
+      <BgSection bg="#150b26" onEnter={setBg} className="mega-section">
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
           <Reveal variant="fade-up">
-            <div className="section-label mb-14">
-              <span className="label-index">04</span>
+            <div className="section-label mb-6">
+              <span className="label-index" style={{ color: "#fbbf24" }}>04</span>
               <span>The Operator</span>
             </div>
           </Reveal>
-          <Reveal variant="fade-up" delay={0.1}>
-            <h2 className="display display-lg max-w-5xl mb-10">
-              Find the repetitive, error-prone process.{" "}
-              <span className="text-gradient-accent">Engineer it away.</span>
-            </h2>
-          </Reveal>
+          <WordReveal
+            text="Find the repetitive, error-prone process. Engineer it away."
+            className="display display-lg max-w-5xl mb-10"
+          />
           <Reveal variant="fade-up" delay={0.2}>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
-              <p className="text-[var(--muted)] text-lg leading-relaxed">
+              <p className="text-[var(--muted-strong)] text-lg leading-relaxed">
                 Eight production automations across IT, Finance, Analytics, and Marketing.
                 Okta administrator. Site admin for Jira, Box, RingCentral, ClickUp, and Loom.
                 LLM agents in daily company-wide use. Every tool documented, guarded, and
-                built to outlive its author.
+                built to outlive its author —{" "}
+                <span className="text-gradient-warm font-semibold">precision is the brand.</span>
               </p>
               <div className="lg:text-right">
                 <Link href="/about" className="nav-link text-[var(--brand)] mono text-sm tracking-widest uppercase">
@@ -308,7 +345,7 @@ export function HomeClient({ projects, skills }: { projects: Project[]; skills: 
             </div>
           </Reveal>
         </div>
-      </section>
+      </BgSection>
 
       {/* ═══════ 05 — INVERTED CONTACT FINALE ═══════ */}
       <section className="invert-section mega-section relative overflow-hidden">
@@ -318,11 +355,10 @@ export function HomeClient({ projects, skills }: { projects: Project[]; skills: 
               // 05 — Contact
             </p>
           </Reveal>
-          <Reveal variant="fade-up" delay={0.1}>
-            <h2 className="display display-xl mb-16 max-w-5xl">
-              Step into the pipeline. Let&apos;s connect.
-            </h2>
-          </Reveal>
+          <WordReveal
+            text="Step into the pipeline. Let's connect."
+            className="display display-xl mb-16 max-w-5xl"
+          />
           <Reveal variant="fade-up" delay={0.2}>
             <div className="flex flex-col items-start">
               <a href="mailto:fabcast03@gmail.com" className="invert-link">Email →</a>
