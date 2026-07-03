@@ -20,7 +20,7 @@ const experience = [
     ],
   },
   {
-    role: "Junior IT Administrator",
+    role: "IT Administrator",
     company: "OMTech",
     location: "Santa Ana, CA",
     period: "2025 — 2026",
@@ -39,6 +39,17 @@ const experience = [
       "Resolved 40+ daily Tier 2/3 tickets spanning networks, payment terminals, and web platforms.",
       "Oversaw E2EE and tokenization across 200+ payment devices at 100% security-standard compliance.",
       "Configured and deployed payment terminals and gateways for 100+ clients nationwide.",
+    ],
+  },
+  {
+    role: "Desktop Technician",
+    company: "Field Service — Dell & HP",
+    location: "Los Angeles Metro, CA",
+    period: "2021 — 2022",
+    bullets: [
+      "Performed weekly field repairs and replacements on Dell and HP laptops and desktops — motherboards, palm rests, keyboards, LCDs, batteries, power supplies, drives, RAM, and graphics cards.",
+      "Managed a full daily repair schedule across diverse customer sites, holding a 95% satisfaction rate through timely repairs and support.",
+      "Trained colleagues on break/fix procedures so the whole team could deliver consistent hardware support.",
     ],
   },
   {
@@ -189,7 +200,7 @@ export function AboutClient() {
               </p>
             </div>
 
-            <div className="hidden lg:flex flex-col gap-4">
+            <div className="flex flex-col gap-4 max-w-sm mx-auto lg:mx-0 lg:max-w-none w-full">
               <div className="hero-portrait">
                 <Image
                   src="/images/hero-fabian.jpg"
@@ -203,7 +214,7 @@ export function AboutClient() {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  { n: "3", l: "Years in IT" },
+                  { n: "5", l: "Years in IT" },
                   { n: "8", l: "Automations" },
                   { n: "17+", l: "Public Repos" },
                   { n: "1", l: "Gold Medal" },
