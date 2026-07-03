@@ -86,12 +86,12 @@ const principles = [
 ];
 
 const interests = [
-  { label: "Hiking", note: "SoCal trails, early starts", photo: "/images/int-hiking.jpg" },
-  { label: "Muay Thai", note: "discipline under pressure", photo: "/images/int-muaythai.jpg" },
-  { label: "Fishing", note: "quiet water, clear head", photo: "/images/int-fishing.jpg" },
+  { label: "Hiking", note: "SoCal trails, early starts", photo: "/images/int-hiking-v2.jpg" },
+  { label: "Muay Thai", note: "discipline under pressure", photo: "/images/int-muaythai-v2.jpg" },
+  { label: "Fishing", note: "quiet water, clear head", photo: "/images/int-fishing-v2.jpg" },
   { label: "Guitar", note: "strings after hours", photo: null },
-  { label: "My Dog", note: "chief morale officer", photo: "/images/int-dog.jpg" },
-  { label: "Good People", note: "build memories, not just systems", photo: "/images/int-friends.jpg" },
+  { label: "My Dog", note: "chief morale officer", photo: "/images/int-dog-v2.jpg" },
+  { label: "Good People", note: "build memories, not just systems", photo: "/images/int-friends-v2.jpg" },
   { label: "Emerging Tech", note: "tools with real-world impact", photo: null },
 ];
 
@@ -203,7 +203,7 @@ export function AboutClient() {
             <div className="flex flex-col gap-4 max-w-sm mx-auto lg:mx-0 lg:max-w-none w-full">
               <div className="hero-portrait">
                 <Image
-                  src="/images/hero-fabian.jpg"
+                  src="/images/hero-fabian-v2.jpg"
                   alt="Fabian Castaneda"
                   width={548}
                   height={700}
