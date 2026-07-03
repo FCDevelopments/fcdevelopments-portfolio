@@ -6,6 +6,17 @@ import { Reveal, CountUp } from "./motion";
 
 const experience = [
   {
+    role: "IT Services Specialist",
+    company: "Smart Circle International — Newport Beach, CA",
+    period: "Apr 2026 – Present",
+    bullets: [
+      "Design and run 8 production automations spanning lifecycle automation, ticket reporting, expense processing, asset reconciliation, and media transcription.",
+      "Spearhead company AI initiatives: an LLM agent integrated with Salesforce, semantic models, and automated AI reporters in daily company-wide use.",
+      "Administer Okta provisioning and application assignment; site administrator for Jira, Box, ClickUp, RingCentral, and Loom.",
+      "Defined the team-wide standard stack for internal web apps — React + TypeScript, Node.js/Express, Entra ID OAuth2/OIDC SSO, Docker.",
+    ],
+  },
+  {
     role: "Junior IT Administrator",
     company: "OMTech — Santa Ana, CA",
     period: "Mar 2025 – Feb 2026",
@@ -35,8 +46,8 @@ const values = [
     copy: "Every tool should work exactly as expected. No guesswork, no ambiguity, no wasted time. I obsess over the details so users don't have to.",
   },
   {
-    title: "Privacy by Default",
-    copy: "User data stays with the user. No tracking, no accounts required, no compromises. Every product I build treats privacy as a core feature, not an afterthought.",
+    title: "Fail Loudly, Never Silently",
+    copy: "Good automation assumes things will go wrong. Stale inputs get rejected, bad rows get quarantined, and failures alert a human — a silent wrong answer is worse than a loud crash.",
   },
   {
     title: "Ship Real Products",
@@ -57,7 +68,7 @@ export function AboutClient() {
     <main className="bg-[var(--background)] grain-overlay relative">
       {/* Hero */}
       <section className="py-24 relative overflow-hidden">
-        <div className="orb orb-gold w-[400px] h-[400px] top-[0%] left-[20%]" />
+        <div className="orb orb-accent w-[400px] h-[400px] top-[0%] left-[20%]" />
         <div className="mx-auto max-w-7xl px-6 lg:px-10 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
@@ -65,44 +76,43 @@ export function AboutClient() {
                 <p className="eyebrow mb-4">About</p>
                 <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[0.95] mb-6">
                   Fabian<br />
-                  <span className="text-gradient-gold">Castaneda.</span>
+                  <span className="text-gradient-accent">Castaneda.</span>
                 </h1>
                 <p className="text-lg text-[var(--muted)] leading-relaxed mb-4">
-                  Operations-ready IT professional based in Cerritos, California, specializing in
-                  cybersecurity, identity &amp; access management, and AI-integrated systems. I bring
-                  hands-on experience managing endpoint infrastructure, Okta/Azure AD environments,
-                  and security operations — combined with the ability to build the automation tools
-                  that make those systems actually run well.
+                  IT systems engineer in Orange County, California. I specialize in workflow
+                  automation and internal tooling: 8 production automations built in Python,
+                  Node.js, and PowerShell that replaced manual, ticket-driven work across IT,
+                  Finance, Analytics, and Marketing — plus AI/LLM agents in daily company-wide use.
                 </p>
                 <p className="text-[var(--muted)] leading-relaxed mb-4">
-                  My focus right now is the intersection of traditional IT ops and AI integration:
-                  building tooling that automates repetitive security workflows, improves operational
-                  visibility, and closes the gap between what enterprise IT systems can do and what
-                  they actually do in practice.
+                  The pattern behind all of it: find the repetitive, error-prone process, understand
+                  why it breaks, then engineer it away — with stale-input guards, quarantine queues
+                  for bad data, offline test suites, and alerting that pages a human before anyone
+                  notices something broke.
                 </p>
                 <p className="text-[var(--muted)] leading-relaxed">
-                  FCDevelopments is where that work shows up publicly — practical tools, real implementations,
-                  and a track record of shipping things that work.
+                  FCDevelopments is where that work shows up publicly — real implementations,
+                  genericized into templates anyone can fork and run.
                 </p>
               </Reveal>
             </div>
             <Reveal variant="fade-left" delay={0.2}>
               <div className="grid grid-cols-2 gap-6">
                 <div className="text-center p-6 card-chrome">
-                  <p className="stat-number text-3xl"><CountUp target={2} suffix="+" /></p>
+                  <p className="stat-number text-3xl"><CountUp target={3} /></p>
                   <p className="stat-label">Years in IT</p>
                 </div>
                 <div className="text-center p-6 card-chrome">
-                  <p className="stat-number text-3xl"><CountUp target={6} suffix="+" /></p>
-                  <p className="stat-label">Projects Built</p>
+                  <p className="stat-number text-3xl"><CountUp target={8} /></p>
+                  <p className="stat-label">Automations in Prod</p>
                 </div>
                 <div className="text-center p-6 card-chrome">
-                  <p className="stat-number text-3xl text-gradient-gold">1</p>
+                  <p className="stat-number text-3xl text-gradient-accent">1</p>
                   <p className="stat-label">Gold Medal</p>
                 </div>
                 <div className="text-center p-6 card-chrome">
-                  <p className="stat-number text-3xl"><CountUp target={3} /></p>
-                  <p className="stat-label">AI Projects</p>
+                  <p className="stat-number text-3xl"><CountUp target={17} suffix="+" /></p>
+                  <p className="stat-label">Public Repos</p>
                 </div>
               </div>
             </Reveal>
@@ -110,7 +120,7 @@ export function AboutClient() {
         </div>
       </section>
 
-      <div className="divider-gold mx-auto max-w-xl" />
+      <div className="divider-accent mx-auto max-w-xl" />
 
       {/* Philosophy */}
       <section className="py-24">
@@ -190,7 +200,7 @@ export function AboutClient() {
         </div>
       </section>
 
-      <div className="divider-gold mx-auto max-w-xl" />
+      <div className="divider-accent mx-auto max-w-xl" />
 
       {/* Beyond the Code */}
       <section className="py-24">
@@ -225,18 +235,18 @@ export function AboutClient() {
 
       {/* CTA */}
       <section className="py-24 text-center relative overflow-hidden">
-        <div className="orb orb-gold w-[500px] h-[500px] bottom-[-20%] left-[30%]" />
+        <div className="orb orb-accent w-[500px] h-[500px] bottom-[-20%] left-[30%]" />
         <div className="mx-auto max-w-7xl px-6 lg:px-10 relative z-10">
           <Reveal variant="scale-in">
             <h2 className="text-4xl lg:text-5xl font-bold tracking-tight mb-6">
-              Let&apos;s build something <span className="text-gradient-gold">together.</span>
+              Let&apos;s build something <span className="text-gradient-accent">together.</span>
             </h2>
             <p className="text-[var(--muted)] text-lg max-w-lg mx-auto mb-10">
-              Check out my projects or try the resume builder.
+              Browse the production work or reach out directly.
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
-              <Link href="/resume-builder" className="button-primary">Resume Builder</Link>
-              <Link href="/projects" className="button-secondary">View Projects</Link>
+              <Link href="/projects" className="button-primary">View Projects</Link>
+              <a href="mailto:fabcast03@gmail.com" className="button-secondary">Email Me</a>
             </div>
           </Reveal>
         </div>

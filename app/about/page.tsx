@@ -3,7 +3,7 @@ import { AboutClient } from "@/src/components/about-client";
 
 export const metadata = {
   title: "About",
-  description: "Learn about Fabian Castaneda — IT professional, developer, and builder of practical tools in Orange County, CA.",
+  description: "Fabian Castaneda — IT systems engineer specializing in workflow automation, systems integration, and AI tooling. Orange County, CA.",
 };
 
 export default function AboutPage() {

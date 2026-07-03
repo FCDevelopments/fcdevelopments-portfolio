@@ -10,14 +10,49 @@ type Project = {
   tech: string[];
   badge: string;
   link: string;
+  github: string;
 };
 
 const badgeColors: Record<string, string> = {
-  Flagship: "bg-amber-500/15 border-amber-400/30 text-amber-300",
-  "AI Platform": "bg-purple-500/15 border-purple-400/30 text-purple-300",
-  "Gold Medal": "bg-yellow-500/15 border-yellow-400/30 text-yellow-200",
+  Production: "bg-emerald-500/15 border-emerald-400/30 text-emerald-300",
+  "AI Tooling": "bg-purple-500/15 border-purple-400/30 text-purple-300",
   Operations: "bg-cyan-500/15 border-cyan-400/30 text-cyan-300",
+  "Web App": "bg-sky-500/15 border-sky-400/30 text-sky-300",
+  Template: "bg-teal-500/15 border-teal-400/30 text-teal-300",
 };
+
+const capabilities = [
+  {
+    title: "Workflow Automation",
+    kicker: "automate()",
+    copy: "Production pipelines that replace recurring manual work — scheduled, monitored, and self-alerting when something needs a human.",
+  },
+  {
+    title: "Systems Integration",
+    kicker: "connect()",
+    copy: "Moving data correctly between the systems a business actually runs on — Jira, Salesforce, Box, RingCentral, Snowflake, Outlook.",
+  },
+  {
+    title: "AI & LLM Tooling",
+    kicker: "augment()",
+    copy: "LLM agents, speech-to-text pipelines, and AI-assisted reporting in daily company-wide use — practical AI, not demos.",
+  },
+  {
+    title: "IT Operations",
+    kicker: "operate()",
+    copy: "Okta administration, identity lifecycle, endpoint management, and the discipline of keeping production systems boring.",
+  },
+];
+
+const terminalLines = [
+  { prompt: true, text: "run nightly-archiver --since last-run" },
+  { cls: "t-dim", text: "auth      RingCentral JWT ........ OK" },
+  { cls: "t-dim", text: "fetch     call log: 3 pages, 612 records" },
+  { cls: "t-info", text: "dedup     609 already archived, 3 new" },
+  { cls: "t-dim", text: "upload    Box /Call Archive/July 2026 ... 3 files" },
+  { cls: "t-ok", text: "✓ complete — 0 failures, state saved" },
+  { prompt: true, text: "", caret: true },
+];
 
 export function HomeClient({ projects, skills }: { projects: Project[]; skills: string[] }) {
   const cursorRef = useRef<HTMLDivElement>(null);
@@ -35,58 +70,94 @@ export function HomeClient({ projects, skills }: { projects: Project[]; skills: 
 
   return (
     <main className="bg-[var(--background)] text-[var(--foreground)] grain-overlay relative">
-      {/* Cursor glow follower */}
       <div ref={cursorRef} className="cursor-glow hidden lg:block" />
 
       {/* ═══════ HERO ═══════ */}
-      <section className="hero-surface relative min-h-[90vh] flex items-center">
-        <div className="orb orb-gold w-[400px] h-[400px] top-[10%] right-[5%]" />
-        <div className="orb orb-warm w-[300px] h-[300px] bottom-[20%] left-[10%]" style={{ animationDelay: "3s" }} />
+      <section className="hero-surface relative min-h-[92vh] flex items-center">
+        <div className="orb orb-accent w-[420px] h-[420px] top-[8%] right-[8%]" />
+        <div className="orb orb-soft w-[320px] h-[320px] bottom-[15%] left-[8%]" style={{ animationDelay: "3s" }} />
 
         <div className="mx-auto max-w-7xl px-6 py-24 lg:px-10 lg:py-32 relative z-10 w-full">
-          <div className="max-w-4xl">
-            <Reveal variant="fade-up" delay={0.1}>
-              <p className="eyebrow mb-6">FCDevelopments</p>
-            </Reveal>
+          <div className="grid grid-cols-1 lg:grid-cols-[1.15fr_0.85fr] gap-16 items-center">
+            <div>
+              <Reveal variant="fade-up" delay={0.1}>
+                <div className="flex items-center gap-3 mb-6">
+                  <span className="relative flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--brand)] opacity-60" />
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[var(--brand)]" />
+                  </span>
+                  <p className="eyebrow">IT Systems Engineer — 8 automations in production</p>
+                </div>
+              </Reveal>
 
-            <Reveal variant="fade-up" delay={0.2}>
-              <h1 className="text-5xl sm:text-6xl lg:text-8xl font-extrabold tracking-tight leading-[0.95] mb-6">
-                <span className="text-[var(--foreground)]">IT Operations</span>
-                <br />
-                <span className="text-[var(--foreground)]">&amp; </span>
-                <span className="text-gradient-gold">Security</span>
-                <span className="text-[var(--foreground)]"> — built</span>
-                <br />
-                <span className="text-[var(--foreground)]">for the AI era.</span>
-              </h1>
-            </Reveal>
+              <Reveal variant="fade-up" delay={0.2}>
+                <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[0.98] mb-6">
+                  I automate the work
+                  <br />
+                  nobody should do
+                  <br />
+                  <span className="text-gradient-accent">by hand.</span>
+                </h1>
+              </Reveal>
 
-            <Reveal variant="fade-up" delay={0.4}>
-              <p className="text-lg lg:text-xl text-[var(--muted)] max-w-3xl mb-10 leading-relaxed">
-                Fabian Castaneda — operations-ready IT professional specializing in cybersecurity,
-                identity & access management, and AI-integrated tooling. I build the automation and
-                systems that make modern IT ops faster, more secure, and actually scalable.
-              </p>
-            </Reveal>
+              <Reveal variant="fade-up" delay={0.4}>
+                <p className="text-lg lg:text-xl text-[var(--muted)] max-w-2xl mb-10 leading-relaxed">
+                  Fabian Castaneda — I design and ship production automation for IT, finance,
+                  and operations: Python and Node.js pipelines, REST API integrations, and
+                  AI/LLM tooling built to run unattended and fail loudly.
+                </p>
+              </Reveal>
 
-            <Reveal variant="fade-up" delay={0.55}>
-              <div className="flex flex-wrap gap-4">
-                <MagneticWrap>
-                  <Link href="/resume-builder" className="button-primary">
-                    Launch Resume Builder
-                  </Link>
-                </MagneticWrap>
-                <MagneticWrap>
-                  <Link href="/projects" className="button-secondary">
-                    View Projects
-                  </Link>
-                </MagneticWrap>
+              <Reveal variant="fade-up" delay={0.55}>
+                <div className="flex flex-wrap gap-4">
+                  <MagneticWrap>
+                    <Link href="/projects" className="button-primary">
+                      View the Work
+                    </Link>
+                  </MagneticWrap>
+                  <MagneticWrap>
+                    <a
+                      href="https://github.com/FCDevelopments"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="button-secondary"
+                    >
+                      GitHub
+                    </a>
+                  </MagneticWrap>
+                </div>
+              </Reveal>
+            </div>
+
+            <Reveal variant="fade-left" delay={0.5}>
+              <div className="terminal-window hidden lg:block" aria-hidden="true">
+                <div className="terminal-titlebar">
+                  <span className="terminal-dot bg-red-500/60" />
+                  <span className="terminal-dot bg-yellow-500/60" />
+                  <span className="terminal-dot bg-green-500/60" />
+                  <span className="ml-3 text-[0.7rem] text-[var(--chrome-dim)]">fcdev — scheduled task</span>
+                </div>
+                <div className="terminal-body">
+                  {terminalLines.map((line, i) => (
+                    <div key={i}>
+                      {line.prompt ? (
+                        <>
+                          <span className="t-prompt">fcdev</span>
+                          <span className="t-dim">:~$ </span>
+                          <span className="t-cmd">{line.text}</span>
+                          {line.caret && <span className="terminal-caret" />}
+                        </>
+                      ) : (
+                        <span className={line.cls}>{line.text}</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
             </Reveal>
           </div>
         </div>
 
-        {/* Bottom fade */}
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[var(--background)] to-transparent" />
       </section>
 
@@ -96,103 +167,69 @@ export function HomeClient({ projects, skills }: { projects: Project[]; skills: 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <Reveal variant="fade-up" delay={0}>
               <div className="text-center">
-                <p className="stat-number"><CountUp target={6} suffix="+" /></p>
-                <p className="stat-label">Products Built</p>
+                <p className="stat-number"><CountUp target={8} /></p>
+                <p className="stat-label">Automations in Production</p>
               </div>
             </Reveal>
             <Reveal variant="fade-up" delay={0.1}>
               <div className="text-center">
-                <p className="stat-number"><CountUp target={2} suffix="+" /></p>
-                <p className="stat-label">Years in IT &amp; Ops</p>
+                <p className="stat-number"><CountUp target={11700} suffix="+" /></p>
+                <p className="stat-label">Recordings Archived</p>
               </div>
             </Reveal>
             <Reveal variant="fade-up" delay={0.2}>
               <div className="text-center">
-                <p className="stat-number"><CountUp target={18} suffix="+" /></p>
-                <p className="stat-label">Workflow &amp; Dev Tools</p>
+                <p className="stat-number"><CountUp target={42000} suffix="+" /></p>
+                <p className="stat-label">Jira Tickets Processed</p>
               </div>
             </Reveal>
             <Reveal variant="fade-up" delay={0.3}>
               <div className="text-center">
-                <p className="stat-number text-gradient-gold">1</p>
-                <p className="stat-label">SkillsUSA Gold Medal</p>
+                <p className="stat-number text-gradient-accent"><CountUp target={30} suffix="+" /></p>
+                <p className="stat-label">Hours Saved / Month</p>
               </div>
             </Reveal>
           </div>
         </div>
       </section>
 
-      {/* ═══════ RESUME BUILDER CTA ═══════ */}
-      <section className="py-28 relative overflow-hidden">
-        <div className="orb orb-gold w-[500px] h-[500px] top-[-10%] left-[30%]" />
-        <div className="mx-auto max-w-7xl px-6 lg:px-10 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <Reveal variant="fade-right">
-                <p className="eyebrow mb-4">Flagship Product</p>
-                <h2 className="text-4xl lg:text-5xl font-bold tracking-tight mb-6 leading-tight">
-                  ATS-friendly resumes.{" "}
-                  <span className="text-gradient-gold">Zero friction.</span>
-                </h2>
-                <p className="text-[var(--muted)] text-lg leading-relaxed mb-8">
-                  Upload your resume or start from scratch. Paste a job description for instant keyword
-                  matching. Get role recommendations, transferable skill analysis, and a clean PDF export
-                  — all in your browser, no account required.
-                </p>
-                <div className="flex flex-wrap gap-4">
-                  <Link href="/resume-builder" className="button-primary">
-                    Try It Free
-                  </Link>
-                  <Link href="/projects" className="button-secondary">
-                    Learn More
-                  </Link>
+      {/* ═══════ CAPABILITIES ═══════ */}
+      <section className="py-28">
+        <div className="mx-auto max-w-7xl px-6 lg:px-10">
+          <Reveal variant="fade-up">
+            <p className="eyebrow mb-4">Capabilities</p>
+            <h2 className="text-4xl lg:text-5xl font-bold tracking-tight mb-14">
+              Design it. Build it.{" "}
+              <span className="text-gradient-accent">Let it run.</span>
+            </h2>
+          </Reveal>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {capabilities.map((cap, i) => (
+              <Reveal key={cap.title} variant="fade-up" delay={i * 0.1}>
+                <div className="card-premium h-full">
+                  <p className="mono text-xs text-[var(--brand)] mb-4">{cap.kicker}</p>
+                  <h3 className="text-lg font-bold mb-3">{cap.title}</h3>
+                  <p className="text-sm text-[var(--muted)] leading-relaxed">{cap.copy}</p>
                 </div>
               </Reveal>
-            </div>
-            <Reveal variant="scale-in" delay={0.2}>
-              <div className="card-premium p-8 relative">
-                <div className="absolute top-4 right-4 flex gap-2">
-                  <div className="w-3 h-3 rounded-full bg-red-500/60" />
-                  <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
-                  <div className="w-3 h-3 rounded-full bg-green-500/60" />
-                </div>
-                <div className="mt-4 space-y-3">
-                  <div className="h-3 bg-white/10 rounded-full w-3/4" />
-                  <div className="h-3 bg-white/10 rounded-full w-full" />
-                  <div className="h-3 bg-white/10 rounded-full w-5/6" />
-                  <div className="h-3 bg-[var(--brand)]/20 rounded-full w-2/3 mt-6" />
-                  <div className="h-3 bg-white/10 rounded-full w-full" />
-                  <div className="h-3 bg-white/10 rounded-full w-4/5" />
-                  <div className="h-3 bg-white/10 rounded-full w-3/4" />
-                  <div className="h-3 bg-[var(--brand)]/20 rounded-full w-1/2 mt-6" />
-                  <div className="h-3 bg-white/10 rounded-full w-full" />
-                  <div className="h-3 bg-white/10 rounded-full w-5/6" />
-                </div>
-                <div className="mt-8 flex gap-3">
-                  <div className="px-4 py-2 rounded bg-[var(--brand)]/20 border border-[var(--brand)]/30 text-[var(--brand)] text-xs font-semibold">ATS-Safe</div>
-                  <div className="px-4 py-2 rounded bg-white/5 border border-white/10 text-[var(--muted)] text-xs font-semibold">Private</div>
-                  <div className="px-4 py-2 rounded bg-white/5 border border-white/10 text-[var(--muted)] text-xs font-semibold">Export PDF</div>
-                </div>
-              </div>
-            </Reveal>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ═══════ DIVIDER ═══════ */}
-      <div className="divider-gold mx-auto max-w-xl" />
+      <div className="divider-accent mx-auto max-w-xl" />
 
-      {/* ═══════ PROJECTS ═══════ */}
+      {/* ═══════ FEATURED PROJECTS ═══════ */}
       <section className="py-28">
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
           <Reveal variant="fade-up">
             <div className="flex items-end justify-between mb-14">
               <div>
-                <p className="eyebrow mb-4">Portfolio</p>
-                <h2 className="text-4xl lg:text-5xl font-bold tracking-tight">Selected Work</h2>
+                <p className="eyebrow mb-4">Production Work</p>
+                <h2 className="text-4xl lg:text-5xl font-bold tracking-tight">Built. Shipped. Running.</h2>
               </div>
               <Link href="/projects" className="nav-link text-[var(--brand)] hidden sm:block">
-                View All →
+                All Projects →
               </Link>
             </div>
           </Reveal>
@@ -201,14 +238,16 @@ export function HomeClient({ projects, skills }: { projects: Project[]; skills: 
             {projects.map((project, i) => {
               const colorClass = badgeColors[project.badge] || "bg-white/5 border-white/10 text-white/60";
               return (
-                <Reveal key={project.name} variant="fade-up" delay={i * 0.1}>
-                  <Link href={project.link} className="block project-showcase group h-full">
+                <Reveal key={project.name} variant="fade-up" delay={i * 0.08}>
+                  <a
+                    href={project.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block project-showcase group h-full"
+                  >
                     <div className="project-image">
-                      <span className="text-4xl opacity-30 group-hover:opacity-60 transition-opacity duration-500">
-                        {project.badge === "Flagship" && "◆"}
-                        {project.badge === "AI Platform" && "⬡"}
-                        {project.badge === "Gold Medal" && "★"}
-                        {project.badge === "Operations" && "⌘"}
+                      <span className="mono text-xs text-[var(--chrome-dim)] group-hover:text-[var(--brand)] transition-colors duration-500">
+                        $ ./{project.name.split(" ")[0].toLowerCase().replace(/[^a-z0-9-]/g, "")}
                       </span>
                     </div>
                     <div className="project-content">
@@ -223,13 +262,13 @@ export function HomeClient({ projects, skills }: { projects: Project[]; skills: 
                       <p className="text-[var(--muted)] text-sm leading-relaxed mb-4">{project.description}</p>
                       <div className="flex flex-wrap gap-2">
                         {project.tech.map((t) => (
-                          <span key={t} className="px-2.5 py-1 rounded text-[0.7rem] bg-white/[0.03] border border-white/[0.06] text-[var(--chrome-dim)]">
+                          <span key={t} className="mono px-2.5 py-1 rounded text-[0.68rem] bg-white/[0.03] border border-white/[0.06] text-[var(--chrome-dim)]">
                             {t}
                           </span>
                         ))}
                       </div>
                     </div>
-                  </Link>
+                  </a>
                 </Reveal>
               );
             })}
@@ -244,7 +283,7 @@ export function HomeClient({ projects, skills }: { projects: Project[]; skills: 
             {[...skills, ...skills].map((skill, i) => (
               <span
                 key={`${skill}-${i}`}
-                className="text-sm font-medium text-[var(--chrome-dim)] uppercase tracking-widest"
+                className="mono text-sm font-medium text-[var(--chrome-dim)] uppercase tracking-widest"
               >
                 {skill}
               </span>
@@ -261,44 +300,44 @@ export function HomeClient({ projects, skills }: { projects: Project[]; skills: 
               <p className="eyebrow mb-4">About</p>
               <h2 className="text-4xl lg:text-5xl font-bold tracking-tight mb-6 leading-tight">
                 Fabian<br />
-                <span className="text-gradient-gold">Castaneda.</span>
+                <span className="text-gradient-accent">Castaneda.</span>
               </h2>
               <p className="text-[var(--muted)] text-lg leading-relaxed mb-4">
-                Systems-minded builder based in Cerritos, CA with a background in IT operations,
-                workflow automation, and practical software development. I focus on tools that make
-                messy operational work clearer, faster, and more useful.
+                IT Services Specialist in Orange County, CA. My job is finding the repetitive,
+                error-prone work inside a business and replacing it with systems that do it
+                correctly every time — then documenting them so they outlive me.
               </p>
-              <p className="text-[var(--muted)] leading-relaxed mb-4">
-                FCDevelopments is evolving beyond a portfolio into a growing product studio — spanning
-                career tools, service-business software, and AI-assisted workflow products with real-world
-                commercial potential.
+              <p className="text-[var(--muted)] leading-relaxed mb-6">
+                Precision is the brand: stale-input guards, quarantine queues for bad data,
+                offline test suites, and alerts that page a human before anyone notices
+                something broke.
               </p>
               <Link href="/about" className="nav-link text-[var(--brand)] text-sm">
-                My Full Story →
+                Full Story →
               </Link>
             </Reveal>
 
             <Reveal variant="fade-left" delay={0.2}>
               <div className="grid grid-cols-2 gap-4 items-stretch">
                 <div className="card-chrome h-full p-6">
-                  <p className="text-[var(--brand)] text-sm font-semibold uppercase tracking-wider mb-2">Cybersecurity</p>
-                  <h3 className="text-lg font-bold mb-1">Security Ops</h3>
-                  <p className="text-sm text-[var(--muted)]">IAM, endpoint hardening, monitoring, compliance tooling</p>
+                  <p className="mono text-xs text-[var(--brand)] uppercase tracking-wider mb-2">Identity</p>
+                  <h3 className="text-lg font-bold mb-1">Okta Admin</h3>
+                  <p className="text-sm text-[var(--muted)]">SSO, provisioning, app assignment, onboarding QC</p>
                 </div>
                 <div className="card-chrome h-full p-6">
-                  <p className="text-[var(--brand)] text-sm font-semibold uppercase tracking-wider mb-2">AI Integration</p>
-                  <h3 className="text-lg font-bold mb-1">AI Tooling</h3>
-                  <p className="text-sm text-[var(--muted)]">Claude AI, OpenAI Codex, MCP servers, workflow automation</p>
+                  <p className="mono text-xs text-[var(--brand)] uppercase tracking-wider mb-2">AI / LLM</p>
+                  <h3 className="text-lg font-bold mb-1">Agents in Prod</h3>
+                  <p className="text-sm text-[var(--muted)]">Salesforce-integrated LLM agent, AI reporters, speech-to-text</p>
                 </div>
                 <div className="card-chrome h-full p-6">
-                  <p className="text-[var(--brand)] text-sm font-semibold uppercase tracking-wider mb-2">Background</p>
-                  <h3 className="text-lg font-bold mb-1">IT Operations</h3>
-                  <p className="text-sm text-[var(--muted)]">Okta, Azure AD, MDM, endpoint lifecycle, Zendesk</p>
+                  <p className="mono text-xs text-[var(--brand)] uppercase tracking-wider mb-2">Platforms</p>
+                  <h3 className="text-lg font-bold mb-1">Site Admin ×5</h3>
+                  <p className="text-sm text-[var(--muted)]">Jira, Box, RingCentral, ClickUp, Loom</p>
                 </div>
                 <div className="card-chrome h-full p-6">
-                  <p className="text-[var(--brand)] text-sm font-semibold uppercase tracking-wider mb-2">Award</p>
-                  <h3 className="text-lg font-bold mb-1">SkillsUSA</h3>
-                  <p className="text-sm text-[var(--muted)]">CA Regional Gold Medal — Web Design &amp; Dev</p>
+                  <p className="mono text-xs text-[var(--brand)] uppercase tracking-wider mb-2">Standards</p>
+                  <h3 className="text-lg font-bold mb-1">Team Stack</h3>
+                  <p className="text-sm text-[var(--muted)]">Defined the internal-apps standard: React + TS, Node, Entra ID SSO, Docker</p>
                 </div>
               </div>
             </Reveal>
@@ -308,24 +347,36 @@ export function HomeClient({ projects, skills }: { projects: Project[]; skills: 
 
       {/* ═══════ FINAL CTA ═══════ */}
       <section className="py-28 relative overflow-hidden">
-        <div className="orb orb-gold w-[600px] h-[600px] bottom-[-20%] right-[10%]" />
+        <div className="orb orb-accent w-[600px] h-[600px] bottom-[-20%] right-[10%]" />
         <div className="mx-auto max-w-7xl px-6 lg:px-10 relative z-10 text-center">
           <Reveal variant="scale-in">
-            <p className="eyebrow mb-6">Get Started</p>
+            <p className="eyebrow mb-6">Contact</p>
             <h2 className="text-4xl lg:text-6xl font-bold tracking-tight mb-6">
-              Ready to build your
+              Have a process that
               <br />
-              <span className="text-gradient-gold">next move?</span>
+              <span className="text-gradient-accent">shouldn&apos;t be manual?</span>
             </h2>
             <p className="text-[var(--muted)] text-lg max-w-xl mx-auto mb-10">
-              Create a polished, ATS-friendly resume in minutes.
-              Free, private, and built to get you hired.
+              I&apos;m always up for talking automation, systems, and the tooling
+              that makes IT teams faster.
             </p>
-            <MagneticWrap className="inline-block">
-              <Link href="/resume-builder" className="button-primary text-lg px-8 py-4">
-                Launch Resume Builder
-              </Link>
-            </MagneticWrap>
+            <div className="flex flex-wrap gap-4 justify-center">
+              <MagneticWrap>
+                <a href="mailto:fabcast03@gmail.com" className="button-primary text-lg px-8 py-4">
+                  Email Me
+                </a>
+              </MagneticWrap>
+              <MagneticWrap>
+                <a
+                  href="https://linkedin.com/in/fcastaneda8"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="button-secondary text-lg px-8 py-4"
+                >
+                  LinkedIn
+                </a>
+              </MagneticWrap>
+            </div>
           </Reveal>
         </div>
       </section>

@@ -4,7 +4,7 @@ import { fetchGitHubProjects } from "@/src/lib/github";
 
 export const metadata = {
   title: "Projects",
-  description: "Portfolio projects by Fabian Castaneda — resume builder, AI platforms, automation tools, and award-winning web design.",
+  description: "Production automation and tooling by Fabian Castaneda — Python and Node.js pipelines, Jira/Salesforce/Box integrations, and AI-assisted workflow tools, synced live from GitHub.",
 };
 
 // Revalidate every hour — new repos appear within 60 min of push

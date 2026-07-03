@@ -5,22 +5,26 @@ import { fetchGitHubProjects } from "@/src/lib/github";
 export const revalidate = 3600;
 
 const skills = [
-  "Python", "TypeScript", "JavaScript", "React", "Next.js", "Tailwind CSS",
-  "Claude AI", "Anthropic API", "MCP Servers", "Node.js", "Okta", "Azure AD",
-  "Docker", "Vercel", "Git", "SQL", "Bash", "REST APIs",
+  "Python", "TypeScript", "Node.js", "PowerShell", "React", "Next.js",
+  "REST APIs", "Playwright", "Claude AI", "MCP Servers", "Okta", "Entra ID",
+  "Jira", "Salesforce", "Box", "RingCentral", "Snowflake", "Docker",
 ];
 
 export default async function Home() {
   const allProjects = await fetchGitHubProjects();
 
-  // Show top 4 on home page
-  const homeProjects = allProjects.slice(0, 4).map((p) => ({
-    name: p.name,
-    description: p.summary,
-    tech: p.tech,
-    badge: p.badge,
-    link: p.link,
-  }));
+  // Featured production automations on the home page (top 6)
+  const homeProjects = allProjects
+    .filter((p) => p.featured)
+    .slice(0, 6)
+    .map((p) => ({
+      name: p.name,
+      description: p.summary,
+      tech: p.tech,
+      badge: p.badge,
+      link: p.link,
+      github: p.github,
+    }));
 
   return (
     <SiteShell>

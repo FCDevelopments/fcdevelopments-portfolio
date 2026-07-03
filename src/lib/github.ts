@@ -2,8 +2,10 @@
  * GitHub API integration for live project sync.
  *
  * Fetches public repos from the FCDevelopments GitHub account
- * and merges them with manual project overrides (for custom
- * descriptions, badges, ordering, and non-GitHub projects).
+ * and merges them with manual overrides (custom descriptions,
+ * badges, tech tags, featured ordering). Archived repos and
+ * forks are excluded automatically, so the site stays in sync
+ * with GitHub profile cleanup.
  */
 
 export interface GitHubRepo {
@@ -28,6 +30,7 @@ export interface Project {
   github: string;
   pushedAt: string;
   stars: number;
+  featured: boolean;
   source: "github" | "manual";
 }
 
@@ -35,26 +38,77 @@ export interface Project {
  * Manual overrides / enrichments for specific repos.
  * Keys are the exact GitHub repo name (case-sensitive).
  * Any field here takes precedence over the GitHub API data.
+ * `featured` pins a repo to the top of the list and the home page.
  */
-const REPO_OVERRIDES: Record<string, Partial<Project> & { hidden?: boolean }> = {
+const REPO_OVERRIDES: Record<
+  string,
+  Partial<Project> & { hidden?: boolean }
+> = {
+  // ── Production automation templates (ran in production; genericized for reuse) ──
+  ringCentralArchiver: {
+    name: "RingCentral Archiver",
+    summary:
+      "Replaces RingCentral's native call-recording archiver: pulls the full call log via API and archives recordings into one clean Box folder per month — 11,700+ recordings recovered, with dedup, rate-limit backoff, and an offline mock test suite.",
+    badge: "Production",
+    tech: ["Python", "RingCentral API", "Box SDK", "Rate Limiting"],
+    featured: true,
+  },
+  AmazonReportBot: {
+    name: "AmazonReportBot",
+    summary:
+      "Playwright automation that downloads the daily Amazon Business order report and emails one receipt per card charge for expense matching — attaches to a real signed-in Edge session over CDP to survive anti-bot walls.",
+    badge: "Production",
+    tech: ["Python", "Playwright", "Outlook COM", "PowerShell"],
+    featured: true,
+  },
+  JiraReporter: {
+    name: "JiraReporter — IT Ticket Dashboard",
+    summary:
+      "Daily dashboard surfacing IT tickets aging past 45 days: interactive Chart.js dashboard served by a local credential-proxying web server, daily email digest, and a Snowflake export for BI reporting.",
+    badge: "Production",
+    tech: ["Python", "Jira REST API", "Chart.js", "Snowflake"],
+    featured: true,
+  },
+  BoxTranscriber: {
+    name: "BoxTranscriber",
+    summary:
+      "Watches a Box folder and auto-transcribes uploaded videos via AssemblyAI, posting timestamped transcripts back as comments — verified on a 19.6 GB video through the ffmpeg large-file path.",
+    badge: "Production",
+    tech: ["Node.js", "AssemblyAI", "Box SDK", "ffmpeg"],
+    featured: true,
+  },
+  ATT_Salesforce_Tool: {
+    name: "AT&T → Salesforce Reconciler",
+    summary:
+      "Weekly asset reconciliation between an AT&T Premier export and Salesforce: header auto-detection, digit-safe IMEI parsing, a bad-row review queue, and a permanent lock against re-activating cancelled lines.",
+    badge: "Production",
+    tech: ["Python", "pandas", "openpyxl", "Task Scheduler"],
+    featured: true,
+  },
+  JiraPhoneReport: {
+    name: "JiraPhoneReport",
+    summary:
+      "Onboarding/offboarding compliance audits that catch phone-provisioning gaps — new hires with no line assigned, departed staff with active billable lines — as color-coded Excel reports.",
+    badge: "Production",
+    tech: ["Python", "Jira REST API", "openpyxl"],
+    featured: true,
+  },
+  JiraAnalyticsReport: {
+    name: "JiraAnalyticsReport",
+    summary:
+      "Weekly team report distilled from 42,000+ historical Jira tickets: incremental fetch, styled Excel workbook, automated Monday-morning Outlook delivery — fetch, format, and send cleanly separated.",
+    badge: "Production",
+    tech: ["PowerShell", "Python", "openpyxl", "Outlook COM"],
+  },
+
+  // ── Product & tooling work ──
   "fcdevelopments-portfolio": {
     name: "FCDevelopments Portfolio",
     summary:
-      "Founder-style portfolio and product studio site showcasing practical software, workflow tools, resume software, and vertical SaaS concepts.",
-    badge: "Flagship",
-    link: "/resume-builder",
-  },
-  "OpenClaw": {
-    name: "OpenClaw AI Platform",
-    summary:
-      "Autonomous AI development platform using Claude AI and MCP server orchestration for intelligent code generation and workflow automation.",
-    badge: "AI Platform",
-  },
-  "PlumbModern": {
-    name: "PlumbModern",
-    summary:
-      "SkillsUSA California Regional Gold Medal winning website. Modern responsive design for a local plumbing business.",
-    badge: "Gold Medal",
+      "This site — a dark, systems-console portfolio built on Next.js App Router with live GitHub project sync via ISR.",
+    badge: "Web App",
+    tech: ["Next.js", "TypeScript", "Tailwind CSS"],
+    link: "/",
   },
   "ticket-triage-tagging-engine": {
     name: "Ticket Triage Engine",
@@ -66,120 +120,92 @@ const REPO_OVERRIDES: Record<string, Partial<Project> & { hidden?: boolean }> = 
   "quote-followup-autopilot": {
     name: "Quote Follow-up Autopilot",
     summary:
-      "Revenue-focused workflow tool for contractors, freelancers, and service businesses to automate quote follow-up and deposit collection.",
+      "Revenue-focused workflow tool for contractors and service businesses to automate quote follow-up and deposit collection.",
     badge: "Web App",
     tech: ["Next.js", "TypeScript", "SaaS"],
   },
   "bar-estimate-compliance-writer": {
     name: "BAR Estimate Compliance Writer",
     summary:
-      "California-focused estimate drafting product that helps repair shops and dealerships produce customer-friendly, compliance-aware repair estimates.",
+      "California-focused estimate drafting product that helps repair shops produce customer-friendly, compliance-aware repair estimates.",
     badge: "Web App",
     tech: ["Next.js", "TypeScript", "Tailwind CSS"],
   },
   "customer-update-hub": {
     name: "Customer Update Hub",
     summary:
-      "Service workflow communication product that helps dealerships, repair shops, and field-service teams reduce status calls and standardize customer updates.",
+      "Service-status communication hub that helps dealerships, repair shops, and field-service teams cut status calls and standardize customer updates.",
     badge: "Web App",
     tech: ["Next.js", "TypeScript", "Workflow Automation"],
   },
   "supportops-copilot": {
     name: "SupportOps Copilot",
     summary:
-      "CLI tool that processes raw support exports into categorized summaries and actionable reporting artifacts for operations teams.",
+      "CLI tool that processes raw support ticket exports into categorized summaries and manager-ready reporting artifacts.",
     badge: "Operations",
     tech: ["Python", "CLI", "Automation"],
   },
-  "zendesk-csv-helper": {
-    name: "Zendesk CSV Helper",
+  "zendesk-csv-cleanup-macro-helper": {
+    name: "Zendesk CSV Cleanup Helper",
     summary:
-      "Utility for cleaning, filtering, and transforming Zendesk ticket exports into structured, actionable CSV data for reporting and analysis.",
+      "Cleans messy Zendesk-style CSV exports and surfaces repeated-response macro candidates for support teams.",
     badge: "Operations",
     tech: ["Python", "CSV", "Automation"],
   },
-  "rest-api-csv-json-template": {
-    name: "REST API CSV/JSON Template",
+  "ticket-log-parser-sla-report": {
+    name: "Ticket Log Parser + SLA Report",
     summary:
-      "Reusable template for building REST API integrations that consume or produce CSV and JSON data, with structured error handling.",
+      "Parses support ticket logs, detects SLA breach signals, and generates a clean summary report.",
     badge: "Operations",
+    tech: ["Python", "CLI", "Reporting"],
+  },
+  "rest-api-to-csv-json-template": {
+    name: "REST API → CSV/JSON Template",
+    summary:
+      "Clean, heavily-commented Python template for pulling REST API data into structured CSV/JSON with error handling and pagination.",
+    badge: "Template",
     tech: ["Python", "REST API", "CSV"],
   },
-  "rest-to-csv": {
-    name: "REST to CSV Converter",
+  "it-onboarding-checklist-automation": {
+    name: "IT Onboarding Checklist Automation",
     summary:
-      "Lightweight utility to fetch data from REST API endpoints and export results directly to structured CSV files.",
+      "Automates the IT-side onboarding checklist so every new hire gets a consistent, verifiable setup.",
     badge: "Operations",
-    tech: ["Python", "REST API", "CSV"],
+    tech: ["Python", "Automation"],
   },
-  // Hide forks or irrelevant repos by name:
-  // "some-fork": { hidden: true },
+
+  // Profile README repo — not a project.
+  FCDevelopments: { hidden: true },
 };
 
 /**
- * Projects that don't live on GitHub but should appear on the site.
+ * Static fallback when the GitHub API is unavailable (rate limit, outage,
+ * bad token): every override with full metadata becomes a project card,
+ * so the site never renders an empty grid.
  */
-const MANUAL_PUSHED_AT = "2026-03-30T15:00:00.000Z";
-
-const MANUAL_PROJECTS: Project[] = [
-  {
-    name: "SupportOps Copilot",
-    summary:
-      "CLI tool that processes raw support exports into categorized summaries and actionable reporting artifacts for operations teams.",
-    tech: ["Python", "CLI", "Automation"],
-    badge: "Operations",
-    link: "https://github.com/FCDevelopments",
-    github: "https://github.com/FCDevelopments",
-    pushedAt: MANUAL_PUSHED_AT,
+const FALLBACK_PROJECTS: Project[] = Object.entries(REPO_OVERRIDES)
+  .filter(([, o]) => !o.hidden && o.name && o.summary && o.tech && o.badge)
+  .map(([repo, o]) => ({
+    name: o.name!,
+    summary: o.summary!,
+    tech: o.tech!,
+    badge: o.badge!,
+    link: o.link || `https://github.com/FCDevelopments/${repo}`,
+    github: `https://github.com/FCDevelopments/${repo}`,
+    pushedAt: "2026-07-01T00:00:00.000Z",
     stars: 0,
-    source: "manual",
-  },
-  {
-    name: "BAR Estimate Compliance Writer",
-    summary:
-      "California-focused estimate drafting product that helps repair shops and dealership service departments produce customer-friendly, compliance-aware repair estimates.",
-    tech: ["Next.js", "TypeScript", "Tailwind CSS"],
-    badge: "Web App",
-    link: "https://github.com/FCDevelopments/bar-estimate-compliance-writer",
-    github: "https://github.com/FCDevelopments/bar-estimate-compliance-writer",
-    pushedAt: MANUAL_PUSHED_AT,
-    stars: 0,
-    source: "manual",
-  },
-  {
-    name: "Customer Update Hub",
-    summary:
-      "Service workflow communication product that helps dealerships, repair shops, and field-service teams reduce status calls and standardize customer updates.",
-    tech: ["Next.js", "TypeScript", "Workflow Automation"],
-    badge: "Web App",
-    link: "https://github.com/FCDevelopments/customer-update-hub",
-    github: "https://github.com/FCDevelopments/customer-update-hub",
-    pushedAt: MANUAL_PUSHED_AT,
-    stars: 0,
-    source: "manual",
-  },
-  {
-    name: "Quote Follow-up Autopilot",
-    summary:
-      "Revenue-focused workflow tool for contractors, freelancers, and service businesses to automate quote follow-up and deposit collection.",
-    tech: ["Next.js", "TypeScript", "SaaS"],
-    badge: "Web App",
-    link: "https://github.com/FCDevelopments/quote-followup-autopilot",
-    github: "https://github.com/FCDevelopments/quote-followup-autopilot",
-    pushedAt: MANUAL_PUSHED_AT,
-    stars: 0,
-    source: "manual",
-  },
-];
+    featured: o.featured ?? false,
+    source: "manual" as const,
+  }));
 
 /** Badge assignment heuristic based on repo topics/language */
 function inferBadge(repo: GitHubRepo): string {
   const topics = repo.topics.map((t) => t.toLowerCase());
-  if (topics.includes("ai") || topics.includes("machine-learning") || topics.includes("claude")) return "AI Platform";
+  if (topics.includes("ai") || topics.includes("claude")) return "AI Tooling";
   if (topics.includes("automation") || topics.includes("cli")) return "Operations";
-  if (topics.includes("award") || topics.includes("skillsusa")) return "Gold Medal";
+  if (topics.includes("template")) return "Template";
   if (repo.language === "TypeScript" || repo.language === "JavaScript") return "Web App";
-  if (repo.language === "Python") return "Python";
+  if (repo.language === "Python" || repo.language === "PowerShell") return "Operations";
   return "Project";
 }
 
@@ -202,7 +228,8 @@ function inferTech(repo: GitHubRepo): string[] {
 
 /**
  * Fetch public repos from GitHub and merge with overrides.
- * Returns a sorted list of projects ready for display.
+ * Returns a sorted list of projects ready for display —
+ * featured production work first, then by most recent push.
  */
 export async function fetchGitHubProjects(): Promise<Project[]> {
   const GITHUB_USERNAME = "FCDevelopments";
@@ -231,8 +258,13 @@ export async function fetchGitHubProjects(): Promise<Project[]> {
     console.warn("Failed to fetch GitHub repos:", err);
   }
 
-  // Transform GitHub repos into projects
-  const githubProjects: Project[] = repos
+  if (repos.length === 0) {
+    return [...FALLBACK_PROJECTS].sort((a, b) =>
+      a.featured === b.featured ? 0 : a.featured ? -1 : 1
+    );
+  }
+
+  const projects: Project[] = repos
     .filter((r) => !r.fork && !r.archived)
     .filter((r) => !REPO_OVERRIDES[r.name]?.hidden)
     .map((repo) => {
@@ -246,24 +278,22 @@ export async function fetchGitHubProjects(): Promise<Project[]> {
         github: repo.html_url,
         pushedAt: repo.pushed_at,
         stars: repo.stargazers_count,
+        featured: override.featured ?? false,
         source: "github" as const,
       };
     });
 
-  // Merge with manual projects (avoid duplicates by name)
-  const allNames = new Set(githubProjects.map((p) => p.name));
-  const manualFiltered = MANUAL_PROJECTS.filter((p) => !allNames.has(p.name));
-
-  // Sort: flagships first, then by most recently pushed
+  // Featured production work first, then badge priority, then recency
   const badgePriority: Record<string, number> = {
-    Flagship: 0, "AI Platform": 1, "Gold Medal": 2, Operations: 3,
+    Production: 0, "AI Tooling": 1, Operations: 2, "Web App": 3, Template: 4,
   };
-  const all = [...githubProjects, ...manualFiltered].sort((a, b) => {
+  projects.sort((a, b) => {
+    if (a.featured !== b.featured) return a.featured ? -1 : 1;
     const pa = badgePriority[a.badge] ?? 10;
     const pb = badgePriority[b.badge] ?? 10;
     if (pa !== pb) return pa - pb;
     return new Date(b.pushedAt).getTime() - new Date(a.pushedAt).getTime();
   });
 
-  return all;
+  return projects;
 }
