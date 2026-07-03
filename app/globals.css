@@ -714,3 +714,72 @@ button:focus-visible {
   height: 100%;
   padding: 0.5rem;
 }
+
+/* ═══════ Interest rows (typographic, light band) ═══════ */
+
+.interest-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.6rem 0;
+  border-bottom: 1px solid rgba(11, 18, 32, 0.1);
+  cursor: default;
+}
+
+.interest-row:first-of-type { border-top: 1px solid rgba(11, 18, 32, 0.1); }
+
+.interest-title {
+  font-family: var(--font-anton), Impact, sans-serif;
+  text-transform: uppercase;
+  font-size: clamp(1.8rem, 5vw, 4rem);
+  line-height: 0.95;
+  color: rgba(11, 18, 32, 0.28);
+  transition: color 0.35s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.interest-row:hover .interest-title {
+  color: #0b1220;
+  transform: translateX(1rem);
+}
+
+.interest-note {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  color: #5a6478;
+  text-align: right;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+  white-space: nowrap;
+}
+
+.interest-row:hover .interest-note { opacity: 1; transform: translateY(0); }
+
+@media (hover: none) {
+  .interest-title { color: #0b1220; }
+  .interest-note { opacity: 1; transform: none; }
+}
+
+/* ═══════ Tool cards (light band grid) ═══════ */
+
+.tool-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #ffffff;
+  border: 1px solid rgba(11, 18, 32, 0.1);
+  border-radius: 0.875rem;
+  padding: 1.5rem;
+  color: #0b1220;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color 0.25s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.tool-card:hover {
+  border-color: rgba(5, 150, 105, 0.45);
+  box-shadow: 0 14px 36px rgba(11, 18, 32, 0.1);
+  transform: translateY(-3px);
+}
