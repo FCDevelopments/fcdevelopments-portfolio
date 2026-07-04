@@ -84,10 +84,12 @@ export function WebGLShader({ className = "absolute inset-0 w-full h-full block"
       const width = canvas.parentElement?.clientWidth ?? window.innerWidth;
       const height = canvas.parentElement?.clientHeight ?? window.innerHeight;
       refs.renderer.setSize(width, height, false);
-      // gl_FragCoord is in device pixels — uniform must use the real buffer size
-      const buf = new THREE.Vector2();
-      refs.renderer.getDrawingBufferSize(buf);
-      refs.uniforms.resolution.value = [buf.x, buf.y];
+      // INTENTIONAL: resolution uniform stays in CSS pixels while gl_FragCoord
+      // runs in device pixels. The DPR mismatch stretches the coordinate space,
+      // which is what creates the wide chromatic rainbow spread — the look this
+      // site is built around. Feeding the "correct" buffer size collapses the
+      // wave into a thin white line. Do not "fix" this.
+      refs.uniforms.resolution.value = [width, height];
     };
 
     const initScene = () => {
