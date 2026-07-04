@@ -865,3 +865,31 @@ button:focus-visible {
     box-shadow: 0 6px 18px rgba(11, 18, 32, 0.25);
   }
 }
+
+/* ═══════ Shader fallback — CSS aurora when WebGL unavailable ═══════ */
+
+@keyframes aurora-drift {
+  0%, 100% { transform: translate(-8%, -4%) rotate(-2deg) scale(1.15); }
+  50% { transform: translate(6%, 5%) rotate(2deg) scale(1.28); }
+}
+
+.shader-fallback {
+  overflow: hidden;
+  background: #04060c;
+}
+
+.shader-fallback::before {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(ellipse 55% 38% at 28% 62%, rgba(52, 211, 153, 0.28), transparent 65%),
+    radial-gradient(ellipse 60% 34% at 72% 38%, rgba(56, 189, 248, 0.24), transparent 65%),
+    radial-gradient(ellipse 45% 30% at 55% 55%, rgba(244, 114, 182, 0.12), transparent 65%);
+  filter: blur(40px);
+  animation: aurora-drift 14s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shader-fallback::before { animation: none; }
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 
 /**
@@ -11,6 +11,7 @@ import * as THREE from "three";
  */
 export function WebGLShader({ className = "absolute inset-0 w-full h-full block" }: { className?: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [failed, setFailed] = useState(false);
   const sceneRef = useRef<{
     scene: THREE.Scene | null;
     camera: THREE.OrthographicCamera | null;
@@ -77,12 +78,21 @@ export function WebGLShader({ className = "absolute inset-0 w-full h-full block"
       const width = canvas.parentElement?.clientWidth ?? window.innerWidth;
       const height = canvas.parentElement?.clientHeight ?? window.innerHeight;
       refs.renderer.setSize(width, height, false);
-      refs.uniforms.resolution.value = [width, height];
+      // gl_FragCoord is in device pixels — uniform must use the real buffer size
+      const buf = new THREE.Vector2();
+      refs.renderer.getDrawingBufferSize(buf);
+      refs.uniforms.resolution.value = [buf.x, buf.y];
     };
 
     const initScene = () => {
       refs.scene = new THREE.Scene();
-      refs.renderer = new THREE.WebGLRenderer({ canvas });
+      // Refuse software/blocklisted GPUs — the CSS fallback looks better than
+      // a stuttering SwiftShader render or a frozen frame.
+      refs.renderer = new THREE.WebGLRenderer({
+        canvas,
+        powerPreference: "high-performance",
+        failIfMajorPerformanceCaveat: true,
+      });
       refs.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       refs.renderer.setClearColor(new THREE.Color(0x000000));
 
@@ -130,12 +140,24 @@ export function WebGLShader({ className = "absolute inset-0 w-full h-full block"
       refs.animationId = requestAnimationFrame(animate);
     };
 
-    initScene();
+    try {
+      initScene();
+    } catch {
+      setFailed(true);
+      return;
+    }
     animate();
+    const onContextLost = (e: Event) => {
+      e.preventDefault();
+      if (refs.animationId) cancelAnimationFrame(refs.animationId);
+      setFailed(true);
+    };
+    canvas.addEventListener("webglcontextlost", onContextLost);
     window.addEventListener("resize", handleResize);
 
     return () => {
       if (refs.animationId) cancelAnimationFrame(refs.animationId);
+      canvas.removeEventListener("webglcontextlost", onContextLost);
       window.removeEventListener("resize", handleResize);
       if (refs.mesh) {
         refs.scene?.remove(refs.mesh);
@@ -148,5 +170,8 @@ export function WebGLShader({ className = "absolute inset-0 w-full h-full block"
     };
   }, []);
 
+  if (failed) {
+    return <div className={`shader-fallback ${className}`} aria-hidden="true" />;
+  }
   return <canvas ref={canvasRef} className={className} aria-hidden="true" />;
 }
