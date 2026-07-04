@@ -89,10 +89,10 @@ const interests = [
   { label: "Hiking", note: "SoCal trails, early starts", photo: "/images/int-hiking-v2.jpg" },
   { label: "Muay Thai", note: "discipline under pressure", photo: "/images/int-muaythai-v2.jpg" },
   { label: "Fishing", note: "quiet water, clear head", photo: "/images/int-fishing-v2.jpg" },
-  { label: "Guitar", note: "strings after hours", photo: null },
+  { label: "Guitar", note: "strings after hours", photo: "/images/int-guitar-v2.jpg" },
   { label: "My Dog", note: "chief morale officer", photo: "/images/int-dog-v2.jpg" },
   { label: "Good People", note: "build memories, not just systems", photo: "/images/int-friends-v2.jpg" },
-  { label: "Emerging Tech", note: "tools with real-world impact", photo: null },
+  { label: "Emerging Tech", note: "tools with real-world impact", photo: "/images/int-tech-v2.jpg" },
 ];
 
 /** Word-stagger headline reveal (shared pattern with home). */
@@ -210,7 +210,7 @@ export function AboutClient() {
                   priority
                   className="hero-portrait-img"
                 />
-                <span className="hero-portrait-tag mono">fabian.castaneda — operator</span>
+                <span className="hero-portrait-tag mono">Fabian Castaneda — Operator</span>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 {[
