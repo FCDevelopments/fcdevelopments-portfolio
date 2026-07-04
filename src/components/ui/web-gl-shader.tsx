@@ -36,11 +36,9 @@ export function WebGLShader({ className = "absolute inset-0 w-full h-full block"
 
   useEffect(() => {
     if (!canvasRef.current) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      // Render the (static) CSS aurora rather than an empty black hero.
-      setFailed(true);
-      return;
-    }
+    // NOTE: the hero shader intentionally runs even under prefers-reduced-motion.
+    // It's the site's signature visual; the CSS aurora only serves as a fallback
+    // for GPUs that genuinely cannot render WebGL (handled below).
 
     const canvas = canvasRef.current;
     const { current: refs } = sceneRef;
