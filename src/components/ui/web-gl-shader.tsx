@@ -36,7 +36,11 @@ export function WebGLShader({ className = "absolute inset-0 w-full h-full block"
 
   useEffect(() => {
     if (!canvasRef.current) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      // Render the (static) CSS aurora rather than an empty black hero.
+      setFailed(true);
+      return;
+    }
 
     const canvas = canvasRef.current;
     const { current: refs } = sceneRef;
@@ -49,7 +53,11 @@ export function WebGLShader({ className = "absolute inset-0 w-full h-full block"
     `;
 
     const fragmentShader = `
+      #ifdef GL_FRAGMENT_PRECISION_HIGH
       precision highp float;
+      #else
+      precision mediump float;
+      #endif
       uniform vec2 resolution;
       uniform float time;
       uniform float xScale;
@@ -132,10 +140,23 @@ export function WebGLShader({ className = "absolute inset-0 w-full h-full block"
       handleResize();
     };
 
+    let frame = 0;
     const animate = () => {
       if (refs.uniforms) refs.uniforms.time.value += 0.01;
       if (refs.renderer && refs.scene && refs.camera) {
         refs.renderer.render(refs.scene, refs.camera);
+        frame++;
+        if (frame === 30) {
+          // Sanity check: a failed shader compile renders silent black.
+          // Sample a few pixels; if everything is zero, use the CSS fallback.
+          const gl = refs.renderer.getContext();
+          const px = new Uint8Array(4 * 16);
+          gl.readPixels(0, Math.floor(gl.drawingBufferHeight / 2), 16, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
+          if (!px.some((v, i) => i % 4 !== 3 && v > 0)) {
+            setFailed(true);
+            return;
+          }
+        }
       }
       refs.animationId = requestAnimationFrame(animate);
     };
