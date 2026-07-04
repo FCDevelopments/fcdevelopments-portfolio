@@ -62,8 +62,18 @@ export function WebGLShader({ className = "absolute inset-0 w-full h-full block"
       uniform float yScale;
       uniform float distortion;
 
+      // Soft chromatic ridge. The core term prevents the 1/abs() singularity
+      // from blowing out to a razor-thin, aliasing hot line — the wider/larger
+      // the display, the worse that shimmer looked. A resolution-derived floor
+      // keeps the ridge the same visual thickness on every screen size.
+      float ridge(float py, float phase, float core) {
+        return 0.05 / (abs(py + sin((phase + time) * xScale) * yScale) + core);
+      }
+
       void main() {
-        vec2 p = (gl_FragCoord.xy * 2.0 - resolution) / min(resolution.x, resolution.y);
+        // Normalize by HEIGHT only so vertical framing is identical across
+        // aspect ratios (16:9 laptop, 21:9 ultrawide, portrait phone).
+        vec2 p = (gl_FragCoord.xy * 2.0 - resolution) / resolution.y;
 
         float d = length(p) * distortion;
 
@@ -71,9 +81,13 @@ export function WebGLShader({ className = "absolute inset-0 w-full h-full block"
         float gx = p.x;
         float bx = p.x * (1.0 - d);
 
-        float r = 0.05 / abs(p.y + sin((rx + time) * xScale) * yScale);
-        float g = 0.05 / abs(p.y + sin((gx + time) * xScale) * yScale);
-        float b = 0.05 / abs(p.y + sin((bx + time) * xScale) * yScale);
+        // Softening floor scales with pixel size (2/resolution.y) so the ridge
+        // stays ~constant thickness whether rendered at 900px or 2160px tall.
+        float core = 0.015 + 1.6 / resolution.y;
+
+        float r = ridge(p.y, rx, core);
+        float g = ridge(p.y, gx, core);
+        float b = ridge(p.y, bx, core);
 
         gl_FragColor = vec4(r, g, b, 1.0);
       }
@@ -96,10 +110,14 @@ export function WebGLShader({ className = "absolute inset-0 w-full h-full block"
       // a stuttering SwiftShader render or a frozen frame.
       refs.renderer = new THREE.WebGLRenderer({
         canvas,
+        antialias: true,
         powerPreference: "high-performance",
         failIfMajorPerformanceCaveat: true,
       });
-      refs.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      // On large, low-DPR desktop panels (e.g. a 34" UHD at 100% scaling,
+      // devicePixelRatio 1) supersample to 1.5x so the ridge stays smooth;
+      // still cap at 2 so 4K/retina laptops don't overdraw.
+      refs.renderer.setPixelRatio(Math.min(Math.max(window.devicePixelRatio, 1.5), 2));
       refs.renderer.setClearColor(new THREE.Color(0x000000));
 
       refs.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, -1);
