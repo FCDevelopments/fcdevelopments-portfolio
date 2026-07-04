@@ -75,7 +75,12 @@ export function WebGLShader({ className = "absolute inset-0 w-full h-full block"
         float g = 0.05 / abs(p.y + sin((gx + time) * xScale) * yScale);
         float b = 0.05 / abs(p.y + sin((bx + time) * xScale) * yScale);
 
-        gl_FragColor = vec4(r, g, b, 1.0);
+        // Dither ONLY: zero-mean +/-1/255 noise breaks up 8-bit banding in the
+        // dark glow falloffs (reads as blocky "pixelation" on large panels).
+        // Cannot shift hue/brightness — do not add anything else here.
+        float dn = fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453) - 0.5;
+
+        gl_FragColor = vec4(vec3(r, g, b) + dn / 255.0, 1.0);
       }
     `;
 
