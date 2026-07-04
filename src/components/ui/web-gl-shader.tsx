@@ -70,11 +70,6 @@ export function WebGLShader({ className = "absolute inset-0 w-full h-full block"
         return 0.05 / (abs(py + sin((phase + time) * xScale) * yScale) + core);
       }
 
-      // Cheap hash for ordered-ish dithering.
-      float hash(vec2 v) {
-        return fract(sin(dot(v, vec2(12.9898, 78.233))) * 43758.5453);
-      }
-
       void main() {
         // Normalize by HEIGHT only so vertical framing is identical across
         // aspect ratios (16:9 laptop, 21:9 ultrawide, portrait phone).
@@ -90,19 +85,11 @@ export function WebGLShader({ className = "absolute inset-0 w-full h-full block"
         // stays ~constant thickness whether rendered at 900px or 2160px tall.
         float core = 0.015 + 1.6 / resolution.y;
 
-        vec3 col = vec3(
-          ridge(p.y, rx, core),
-          ridge(p.y, gx, core),
-          ridge(p.y, bx, core)
-        );
+        float r = ridge(p.y, rx, core);
+        float g = ridge(p.y, gx, core);
+        float b = ridge(p.y, bx, core);
 
-        // Dither: add ±1/255 of animated noise before the 8-bit write. This
-        // breaks up color banding in the dark gradient falloffs — the stepped
-        // blocks that read as "pixelation" on large UHD panels.
-        float n = hash(gl_FragCoord.xy + fract(time)) - 0.5;
-        col += n / 255.0;
-
-        gl_FragColor = vec4(col, 1.0);
+        gl_FragColor = vec4(r, g, b, 1.0);
       }
     `;
 

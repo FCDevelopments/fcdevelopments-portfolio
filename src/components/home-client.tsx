@@ -130,8 +130,8 @@ export function HomeClient({ projects, skills }: { projects: Project[]; skills: 
     >
       {/* ═══════ HERO — WebGL shader + kinetic type ═══════ */}
       <BgSection bg={HERO_BG} onEnter={setBg} className="relative min-h-screen flex flex-col justify-center overflow-hidden">
-        <WebGLShader className="absolute inset-0 w-full h-full block opacity-90" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#04060c]/40 via-transparent to-[#04060c]" />
+        <WebGLShader className="absolute inset-0 w-full h-full block opacity-70" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#04060c]" />
 
         <div className="mx-auto max-w-7xl px-6 lg:px-10 relative z-10 w-full pt-20">
           <div className="flex items-center gap-2 mb-8">
