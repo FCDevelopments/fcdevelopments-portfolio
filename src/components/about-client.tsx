@@ -53,7 +53,7 @@ const experience = [
     ],
   },
   {
-    role: "A.S. Computer Science",
+    role: "A.S. Computer Information Systems (CIS)",
     company: "Irvine Valley College",
     location: "Irvine, CA",
     period: "2025 — 2027",
